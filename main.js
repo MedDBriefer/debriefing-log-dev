@@ -8,15 +8,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6643);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7267);
 /* harmony import */ var _meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6011);
 /* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9526);
 /* harmony import */ var _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8912);
-/* harmony import */ var _meddbriefer_log_chooser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9834);
-/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3015);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/apps/debriefer/src/App.js";
-
+/* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3015);
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9663);
+var _jsxFileName = "/Users/user/Projects/monorepo/apps/debriefer/src/App.js";
 
 
 
@@ -28,58 +27,70 @@ const App = props => {
   const {
     auth,
     db
-  } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_1__.useFirebaseProject)(_environments_environment__WEBPACK_IMPORTED_MODULE_4__.environment.firebaseProject);
-  let history = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_6__.useHistory)();
-  window.db = db;
-
-  function redirectToCond1Debriefing(debriefID) {
-    const newURL = `/debriefing/${debriefID}`;
-    history.push(newURL);
-  }
-
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxDEV)(_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_1__.FirebaseContext.Provider, {
+  } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_1__.useFirebaseProject)(_environments_environment__WEBPACK_IMPORTED_MODULE_3__.environment.firebaseProject);
+  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_1__.FirebaseContext.Provider, {
     value: {
       auth,
       db
     },
-    children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.AuthProvider, {
-      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_6__.Switch, {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.PrivateRoute, {
-          exact: true,
-          path: "/debriefing/:logID",
-          authFlowLayout: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.UnauthedLayout,
-          component: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.GetReview
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 48,
-          columnNumber: 15
-        }, undefined), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.PrivateRoute, {
-          authFlowLayout: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.UnauthedLayout,
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxDEV)(_meddbriefer_log_chooser__WEBPACK_IMPORTED_MODULE_3__.LogChooser, {
-            redirectToCond1Debriefing: redirectToCond1Debriefing
+    children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.AuthProvider, {
+      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.HashRouter, {
+        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_6__.Switch, {
+          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.PrivateRoute, {
+            exact: true,
+            path: "/logs/:logID",
+            authFlowLayout: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.UnauthedLayout,
+            component: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.AnalyzeDebriefing
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 56,
-            columnNumber: 17
-          }, undefined)
-        }, void 0, false, {
+            lineNumber: 27,
+            columnNumber: 15
+          }, undefined), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.PrivateRoute, {
+            exact: true,
+            path: "/analysis/startReview/:logID",
+            authFlowLayout: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.UnauthedLayout,
+            component: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.InitializeForReview
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 35,
+            columnNumber: 15
+          }, undefined), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.PrivateRoute, {
+            exact: true,
+            path: "/comment/display/:logID",
+            authFlowLayout: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.UnauthedLayout,
+            component: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.GetReview
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 41,
+            columnNumber: 15
+          }, undefined), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxDEV)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_0__.PrivateRoute, {
+            match: true,
+            path: "/",
+            authFlowLayout: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.UnauthedLayout,
+            component: _meddbriefer_cond1_debriefing_ui__WEBPACK_IMPORTED_MODULE_2__.LogList
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 49,
+            columnNumber: 15
+          }, undefined)]
+        }, void 0, true, {
           fileName: _jsxFileName,
-          lineNumber: 55,
-          columnNumber: 15
-        }, undefined)]
-      }, void 0, true, {
+          lineNumber: 26,
+          columnNumber: 13
+        }, undefined)
+      }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 33,
-        columnNumber: 13
+        lineNumber: 25,
+        columnNumber: 11
       }, undefined)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 32,
+      lineNumber: 24,
       columnNumber: 9
     }, undefined)
   }, void 0, false, {
     fileName: _jsxFileName,
-    lineNumber: 26,
+    lineNumber: 18,
     columnNumber: 7
   }, undefined);
 };
@@ -99,7 +110,7 @@ __webpack_require__.r(__webpack_exports__);
 // When building for production, this file is replaced with `environment.prod.ts`.
 const environment = {
   production: false,
-  firebaseProject: "ScottDev" || 0
+  firebaseProject: "PamDev" || 0
 };
 
 /***/ }),
@@ -111,32 +122,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2784);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7029);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6643);
 /* harmony import */ var _App__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7295);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/apps/debriefer/src/main.js";
-
+var _jsxFileName = "/Users/user/Projects/monorepo/apps/debriefer/src/main.js";
 
 
 
 
 const root = react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot(document.getElementById("root"));
 root.render( /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxDEV)(react__WEBPACK_IMPORTED_MODULE_0__.StrictMode, {
-  children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.HashRouter, {
-    children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxDEV)(_App__WEBPACK_IMPORTED_MODULE_2__["default"], {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 10,
-      columnNumber: 13
-    }, undefined)
-  }, void 0, false, {
+  children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxDEV)(_App__WEBPACK_IMPORTED_MODULE_2__["default"], {}, void 0, false, {
     fileName: _jsxFileName,
-    lineNumber: 9,
-    columnNumber: 9
+    lineNumber: 7,
+    columnNumber: 25
   }, undefined)
 }, void 0, false, {
   fileName: _jsxFileName,
-  lineNumber: 8,
-  columnNumber: 5
+  lineNumber: 7,
+  columnNumber: 13
 }, undefined));
 
 /***/ }),
@@ -2369,6 +2372,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "pushNew": () => (/* binding */ pushNew),
 /* harmony export */   "retrieveDebriefing": () => (/* binding */ retrieveDebriefing),
 /* harmony export */   "saveAnalysisLog": () => (/* binding */ saveAnalysisLog),
+/* harmony export */   "saveAsCommentLog": () => (/* binding */ saveAsCommentLog),
 /* harmony export */   "saveCommentLog": () => (/* binding */ saveCommentLog),
 /* harmony export */   "saveLog": () => (/* binding */ saveLog),
 /* harmony export */   "trimAction": () => (/* binding */ trimAction),
@@ -2868,31 +2872,31 @@ const saveAnalysisLog = (db, metaData, actions) => {
   window.alert(`analyzed-log/${data.label} created`);
   return savedData;
 };
-const saveCommentLog = async (db, priorLog, comments, userName) => {
+const saveCommentLog = (db, priorLog, comments, userName) => {
   let data = {
     label: priorLog.label || null,
     commenter: userName,
-    analysisLogID: priorLog.id,
+    analysisLogID: priorLog.logID,
     comments: comments,
     timestamp: Date()
   };
-  await saveLog(db, "cond1-comments", data);
-  window.alert(`cond1-comments/${priorLog.label} saved`); // return savedData
-}; // export const saveAsCommentLog = (db, priorLog, comments, userName) => {
-//   let filename = window.prompt("Enter new filename", priorLog.label);
-//   let data =
-//       {
-//         label: filename || null,
-//         commenter: userName,
-//         analysisLogID: analysisLogID || null,
-//         comments: comments || null,
-//         timestamp: Date(),
-//       };
-//     let savedData = saveLog(db, "cond1-comments", data);
-//     window.alert(`cond1-comments/${filename} saved`); 
-//     return savedData;  
-// };
-
+  let savedData = saveLog(db, "cond1-comments", data);
+  window.alert(`cond1-comments/${priorLog.label} saved`);
+  return savedData;
+};
+const saveAsCommentLog = (db, priorLog, comments, userName) => {
+  let filename = window.prompt("Enter new filename", priorLog.label);
+  let data = {
+    label: filename || null,
+    commenter: userName,
+    analysisLogID: analysisLogID || null,
+    comments: comments || null,
+    timestamp: Date()
+  };
+  let savedData = saveLog(db, "cond1-comments", data);
+  window.alert(`cond1-comments/${filename} saved`);
+  return savedData;
+};
 async function saveLog(db, collection, data) {
   //console.log("In saveLog")
   const docRef = db.collection(collection).doc();
@@ -3276,7 +3280,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _DisplayContent__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(8351);
 /* harmony import */ var _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(9205);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/Analyze.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/Analyze.js";
 
 
 
@@ -3385,7 +3389,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7267);
 /* harmony import */ var _Analyze__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4188);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/AnalyzeDebriefing.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/AnalyzeDebriefing.js";
 
  //this is all because I don't know how to pass an argument to a component in private route
 
@@ -3423,13 +3427,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(2784);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(8959);
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(1412);
-/* harmony import */ var _meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(4303);
-/* harmony import */ var _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9205);
-/* harmony import */ var _MDBNavBar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(1757);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/DisplayContent.js";
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(8959);
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(1412);
+/* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9526);
+/* harmony import */ var _meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(4303);
+/* harmony import */ var _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9205);
+/* harmony import */ var _MDBNavBar__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(1757);
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(9663);
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/DisplayContent.js";
+
 
 
 
@@ -3447,13 +3453,25 @@ function DisplayContent({
   analysisLog,
   actions,
   scenario,
-  getComment,
-  updateComment,
-  saveComments
+  comments
 }) {
+  var commentIndex;
+  const {
+    db
+  } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_5__.useFirebase)();
   const [showCommentColumn, setShowCommentColumn] = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)(false); //const [events, setEvents] = useState(analysislog.events);
 
   const [formattedActions, setFormattedActions] = (0,react__WEBPACK_IMPORTED_MODULE_4__.useState)(undefined);
+
+  const saveCommentLogLocally = () => {
+    analysisLog.id = undefined;
+    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.saveCommentLog)(db, analysisLog, comments, _MDBNavBar__WEBPACK_IMPORTED_MODULE_8__.currentUserName);
+  };
+
+  const saveAsCommentLogLocally = () => {
+    analysisLog = (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.saveAsCommentLog)(db, analysisLog, comments, _MDBNavBar__WEBPACK_IMPORTED_MODULE_8__.currentUserName);
+    displayIt();
+  };
 
   const toggleComments = () => {
     setShowCommentColumn(!showCommentColumn);
@@ -3474,37 +3492,37 @@ function DisplayContent({
         });
       } else {
         answers.push({
-          ID: _meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.promptIDs[prompt],
+          ID: _meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.promptIDs[prompt],
           answer: value.givenAnswer
         });
       }
     }
 
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("p", {
-      children: answers.map((entry, index) => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("b", {
+    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("p", {
+      children: answers.map((entry, index) => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {
+        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("b", {
           children: [entry.ID, ":"]
         }, void 0, true, {
           fileName: _jsxFileName,
-          lineNumber: 46,
+          lineNumber: 60,
           columnNumber: 21
-        }, this), " ", entry.answer, /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("br", {}, void 0, false, {
+        }, this), " ", entry.answer, /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("br", {}, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 47,
+          lineNumber: 61,
           columnNumber: 21
-        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("br", {}, void 0, false, {
+        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("br", {}, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 48,
+          lineNumber: 62,
           columnNumber: 21
         }, this)]
       }, index, true, {
         fileName: _jsxFileName,
-        lineNumber: 45,
+        lineNumber: 59,
         columnNumber: 17
       }, this))
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 43,
+      lineNumber: 57,
       columnNumber: 13
     }, this);
   };
@@ -3512,63 +3530,64 @@ function DisplayContent({
   let phaseFBGiven = [];
 
   const dispHeaderRow = (entry, index) => {
+    commentIndex = index;
     let phaseFB = "";
     let result;
 
     if (entry.id === "assessmentHeader") {
-      result = (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getPhaseFeedback)(entry, phaseFBGiven);
+      result = (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.getPhaseFeedback)(entry, phaseFBGiven);
       phaseFB = result[0];
       phaseFBGiven = result[1];
     }
 
     if (entry.id === "assessmentHeader") {
       //|| entry.id === "assessmentSubHeader") 
-      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
+      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
           colSpan: "3",
-          className: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getColor)(entry),
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("b", {
+          className: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.getColor)(entry),
+          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("b", {
             children: entry.label
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 68,
+            lineNumber: 83,
             columnNumber: 25
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 67,
+          lineNumber: 82,
           columnNumber: 21
-        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
+        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
           children: phaseFB
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 70,
+          lineNumber: 85,
           columnNumber: 21
-        }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("textarea", {
+        }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
+          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("textarea", {
             rows: "2",
             cols: "50",
-            defaultValue: getComment(index),
-            onBlur: event => saveComment(event, index),
+            defaultValue: comments[index],
+            onBlur: saveComment,
             id: `${entry.id}`
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 73,
+            lineNumber: 88,
             columnNumber: 25
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 72,
+          lineNumber: 87,
           columnNumber: 21
         }, this)]
       }, void 0, true);
     } else {
-      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
+      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
         colSpan: "10",
         className: "black"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 86,
+        lineNumber: 101,
         columnNumber: 17
       }, this);
     }
@@ -3586,136 +3605,136 @@ function DisplayContent({
 
   function vitalLabel(entry) {
     if (entry.vitalType === "intervention-status") {
-      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("b", {
+      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
+        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("b", {
           children: "Requested intervention status for:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 111,
+          lineNumber: 126,
           columnNumber: 21
-        }, this), " ", getStatusLabel(entry), ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {
+        }, this), " ", getStatusLabel(entry), ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {
           className: "text-muted",
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("p", {
-            children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("b", {
+          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("p", {
+            children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("b", {
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 112,
+              lineNumber: 127,
               columnNumber: 53
-            }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("i", {
+            }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 112,
+              lineNumber: 127,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 112,
+            lineNumber: 127,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 112,
+          lineNumber: 127,
           columnNumber: 21
         }, this)]
       }, void 0, true);
     }
 
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("b", {
+    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("b", {
         children: "Requested vital:"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 118,
+        lineNumber: 133,
         columnNumber: 17
-      }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {
+      }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {
         className: "text-muted",
-        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("p", {
-          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("b", {
+        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("p", {
+          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("b", {
             children: "Found:"
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 119,
+            lineNumber: 134,
             columnNumber: 49
-          }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("i", {
+          }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("i", {
             children: entry.value
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 119,
+            lineNumber: 134,
             columnNumber: 68
           }, this)]
         }, void 0, true, {
           fileName: _jsxFileName,
-          lineNumber: 119,
+          lineNumber: 134,
           columnNumber: 46
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 119,
+        lineNumber: 134,
         columnNumber: 17
       }, this)]
     }, void 0, true);
   }
 
   function regularLabel(entry) {
-    return entry.subPhase && entry.type !== "intervention" ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+    return entry.subPhase && entry.type !== "intervention" ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
       children: [entry.actionDescription, ".  ", findingsData(entry)]
     }, void 0, true) : phaseLabel(entry);
   }
 
   function phaseLabel(entry) {
-    return entry.type === "intervention" ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+    return entry.type === "intervention" ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
       children: [entry.actionDescription, ". ", answerData(entry), " "]
-    }, void 0, true) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
+    }, void 0, true) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
       children: [entry.actionDescription, ".  ", findingsData(entry)]
     }, void 0, true);
   }
 
   function findingsData(entry) {
-    return entry.finding ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {
+    return entry.finding ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {
       className: "text-muted",
-      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("p", {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("b", {
+      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("p", {
+        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("b", {
           children: "Findings:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 139,
+          lineNumber: 154,
           columnNumber: 47
-        }, this), " ", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("i", {
+        }, this), " ", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("i", {
           children: entry.finding
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 139,
+          lineNumber: 154,
           columnNumber: 64
         }, this)]
       }, void 0, true, {
         fileName: _jsxFileName,
-        lineNumber: 139,
+        lineNumber: 154,
         columnNumber: 44
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 139,
+      lineNumber: 154,
       columnNumber: 15
-    }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {}, void 0, false, {
+    }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {}, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 140,
+      lineNumber: 155,
       columnNumber: 15
     }, this);
   }
 
   function answerData(entry) {
-    return entry.answerDetails ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {
+    return entry.answerDetails ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {
       className: "text-muted",
       children: formatAnswerGiven(entry)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 145,
+      lineNumber: 160,
       columnNumber: 14
-    }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {}, void 0, false, {
+    }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {}, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 146,
+      lineNumber: 161,
       columnNumber: 14
     }, this);
   }
@@ -3733,61 +3752,60 @@ function DisplayContent({
   */
 
 
-  function saveComment(event, index) {
-    const newValue = event.target.value;
-    console.log(newValue, index);
-    updateComment(index, newValue);
+  function saveComment(val) {
+    comments[commentIndex] = val;
   }
 
   const dispDataRow = (entry, index) => {
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
+    commentIndex = index;
+    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
         children: entry.numericalID
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 175,
+        lineNumber: 189,
         columnNumber: 17
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
-        children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getTimestamp)(entry)
+      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
+        children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.getTimestamp)(entry)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 176,
+        lineNumber: 190,
         columnNumber: 17
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
-        className: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getColor)(entry),
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("span", {
+      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
+        className: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.getColor)(entry),
+        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("span", {
           className: "material-icons-outlined",
-          children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getAssessmentIcon)(entry)
+          children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.getAssessmentIcon)(entry)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 178,
+          lineNumber: 192,
           columnNumber: 21
         }, this), getLabel(entry)]
       }, void 0, true, {
         fileName: _jsxFileName,
-        lineNumber: 177,
+        lineNumber: 191,
         columnNumber: 17
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
-        children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getFeedback)(entry)
+      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
+        children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.getFeedback)(entry)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 181,
+        lineNumber: 195,
         columnNumber: 17
-      }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("td", {
-        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("textarea", {
+      }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("td", {
+        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("textarea", {
           rows: "2",
           cols: "50",
-          defaultValue: getComment(index),
-          onBlur: event => saveComment(event, index),
+          defaultValue: comments[index],
+          onBlur: saveComment,
           id: `${entry.id}`
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 185,
+          lineNumber: 199,
           columnNumber: 25
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 184,
+        lineNumber: 198,
         columnNumber: 21
       }, this)]
     }, void 0, true);
@@ -3803,14 +3821,15 @@ function DisplayContent({
 
 
   function displayIt() {
-    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.setC2FB)(scenario, analysisLog.FBfields);
-    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.setRequiredPhaseNames)(analysisLog.requiredPhaseNames);
-    (0,_meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_6__.setFeedbackTemplates)(analysisLog.feedbackTemplates); // if (comments){
+    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.setC2FB)(scenario, analysisLog.FBfields);
+    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.setRequiredPhaseNames)(analysisLog.requiredPhaseNames);
+    (0,_meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_7__.setFeedbackTemplates)(analysisLog.feedbackTemplates);
 
-    setShowCommentColumn(true); // }
-    // else {
-    //     setShowCommentColumn(false)
-    // }
+    if (comments) {
+      setShowCommentColumn(true);
+    } else {
+      setShowCommentColumn(false);
+    }
 
     setFormattedActions(actions);
   }
@@ -3821,137 +3840,138 @@ function DisplayContent({
   );
 
   if (undefined === formattedActions) {
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("h3", {
+    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("h3", {
       children: "processing"
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 230,
+      lineNumber: 244,
       columnNumber: 17
     }, this);
   }
 
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.Fragment, {
-    children: [showCommentColumn ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(_MDBNavBar__WEBPACK_IMPORTED_MODULE_7__["default"], {
+  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.Fragment, {
+    children: [comments ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(_MDBNavBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
       title: `Review of: ${analysisLog.label}`,
-      leftNav1: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      leftNav1: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_10__["default"], {
         color: "primary",
-        onClick: () => saveComments(),
+        onClick: saveCommentLogLocally,
         children: "Save"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 239,
+        lineNumber: 253,
         columnNumber: 29
-      }, this) // leftNav2={
-      //     <Button
-      //         color="primary"
-      //         onClick={saveAsCommentLogLocally}
-      //     >
-      //         Save As
-      //     </Button>
-      // }
-      ,
-      rightNav: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      }, this),
+      leftNav2: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_10__["default"], {
+        color: "primary",
+        onClick: saveAsCommentLogLocally,
+        children: "Save As"
+      }, void 0, false, {
+        fileName: _jsxFileName,
+        lineNumber: 261,
+        columnNumber: 29
+      }, this),
+      rightNav: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_10__["default"], {
         color: "primary",
         onClick: toggleComments,
         children: "Toggle Comments"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 255,
+        lineNumber: 269,
         columnNumber: 29
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 236,
+      lineNumber: 250,
       columnNumber: 19
-    }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(_MDBNavBar__WEBPACK_IMPORTED_MODULE_7__["default"], {
+    }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(_MDBNavBar__WEBPACK_IMPORTED_MODULE_8__["default"], {
       title: `Analysis for: ${analysisLog.label}`
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 263,
+      lineNumber: 277,
       columnNumber: 19
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("form", {
-      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("div", {
+    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("form", {
+      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("div", {
         style: {
           overflowY: "auto",
           maxHeight: "700px"
         },
-        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_10__["default"], {
+        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_11__["default"], {
           borderless: true,
           size: "sm",
-          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("thead", {
-            children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("tr", {
-              children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("th", {
+          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("thead", {
+            children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("tr", {
+              children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("th", {
                 className: "table-header",
                 children: " ID "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 272,
+                lineNumber: 286,
                 columnNumber: 29
-              }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("th", {
+              }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Timestamp "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 273,
+                lineNumber: 287,
                 columnNumber: 29
-              }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("th", {
+              }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Action Description "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 274,
+                lineNumber: 288,
                 columnNumber: 29
-              }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("th", {
+              }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Feedback "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 275,
+                lineNumber: 289,
                 columnNumber: 29
-              }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("th", {
+              }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Comments "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 276,
+                lineNumber: 290,
                 columnNumber: 51
               }, this)]
             }, void 0, true, {
               fileName: _jsxFileName,
-              lineNumber: 271,
+              lineNumber: 285,
               columnNumber: 25
             }, this)
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 270,
+            lineNumber: 284,
             columnNumber: 21
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("tbody", {
+          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("tbody", {
             className: "scroll",
-            children: formattedActions.map((currentEntry, index) => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("tr", {
+            children: formattedActions.map((currentEntry, index) => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("tr", {
               children: currentEntry.type === "header" ? dispHeaderRow(currentEntry, index) : dispDataRow(currentEntry, index)
             }, index, false, {
               fileName: _jsxFileName,
-              lineNumber: 281,
+              lineNumber: 295,
               columnNumber: 29
             }, this))
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 279,
+            lineNumber: 293,
             columnNumber: 21
           }, this)]
         }, void 0, true, {
           fileName: _jsxFileName,
-          lineNumber: 269,
+          lineNumber: 283,
           columnNumber: 17
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 268,
+        lineNumber: 282,
         columnNumber: 13
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 267,
+      lineNumber: 281,
       columnNumber: 13
     }, this)]
   }, void 0, true);
@@ -3972,16 +3992,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2784);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(7267);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(7267);
 /* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9526);
-/* harmony import */ var _meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6011);
-/* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8913);
-/* harmony import */ var _meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(4303);
-/* harmony import */ var _DisplayContent__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(8351);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/GetReview.js";
-
-
+/* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8913);
+/* harmony import */ var _DisplayContent__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8351);
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9663);
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/GetReview.js";
 
 
 
@@ -3995,11 +4011,8 @@ function GetReview() {
     db
   } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__.useFirebase)();
   const {
-    userName
-  } = (0,react__WEBPACK_IMPORTED_MODULE_2__.useContext)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_4__.AuthContext);
-  const {
     logID
-  } = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_9__.useParams)();
+  } = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_7__.useParams)();
   const [loaded, setLoaded] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
   const [comments, setComments] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
   const [actions, setActions] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
@@ -4007,58 +4020,49 @@ function GetReview() {
   const [analysisLog, setAnalysisLog] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null); //if there is a comment log for the input id then use that to get the
   //analysis log, otherwise the input logID is an analysis log
 
-  const getComment = index => comments[index];
-
-  const updateComment = (index, value) => {
-    const copy = [...comments];
-    copy[index] = value;
-    setComments(copy);
-  };
-
-  const storeComments = () => {
-    // analysisLog.id = undefined
-    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.saveCommentLog)(db, analysisLog, comments, userName);
-  }; // const saveAsCommentLogLocally = () => {
-  //     analysisLog = saveAsCommentLog(db, analysisLog, comments , userName)
-  // }
-
-
   (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_5__.getCond1CommentLog)(db, logID).then(debriefLogData => {
-      (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_5__.getAnalysisLog)(db, debriefLogData.analysisLogID).then(analysisLogData => {
+    (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getCond1CommentLog)(db, logID).then(debriefLogData => {
+      (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getAnalysisLog)(db, debriefLogData.analysisLogID).then(analysisLogData => {
         setAnalysisLog(analysisLogData);
         setActions(analysisLogData.events);
-        setComments(debriefLogData.comments);
-        (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_5__.getObserverLog)(db, analysisLogData.observerLogID).then(observerLogData => {
-          (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_5__.getPublishedScenarioObjectByID)(db, observerLogData.scenarioID).then(scenData => {
+
+        if (debriefLogData.comments) {
+          setComments(debriefLogData.comments);
+        } else {
+          setComments(Array(analysisLogData.events.length).fill(""));
+        }
+
+        (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getObserverLog)(analysisLogData.observerLogID).then(observerLogData => {
+          (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getPublishedScenarioObjectByID)(db, observerLogData.scenarioID).then(scenData => {
             setScenario(scenData);
-            setLoaded(true);
           });
         });
       });
     });
-  }, [db, logID]);
+  }, // eslint-disable-next-line react-hooks/exhaustive-deps
+  [logID]);
+  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
+    !!scenario && setLoaded(true);
+  }, [scenario]);
 
   if (!loaded) {
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)("h3", {
+    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)("h3", {
       children: "Loading"
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 67,
+      lineNumber: 57,
       columnNumber: 13
     }, this);
   }
 
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(_DisplayContent__WEBPACK_IMPORTED_MODULE_7__["default"], {
+  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)(_DisplayContent__WEBPACK_IMPORTED_MODULE_5__["default"], {
     analysisLog: analysisLog,
     actions: actions,
     scenario: scenario,
-    getComment: getComment,
-    updateComment: updateComment,
-    saveComments: storeComments
+    comments: comments
   }, void 0, false, {
     fileName: _jsxFileName,
-    lineNumber: 71,
+    lineNumber: 61,
     columnNumber: 5
   }, this);
 }
@@ -4077,7 +4081,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6011);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/Header.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/Header.js";
 
 
 
@@ -4146,7 +4150,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8913);
 /* harmony import */ var _DisplayContent__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8351);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/InitializeForReview.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/InitializeForReview.js";
 
 
 
@@ -4227,7 +4231,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(8959);
 /* harmony import */ var _meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6011);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/MDBNavBar.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/MDBNavBar.js";
 
 
 
@@ -4324,7 +4328,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _MDBNavBar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1757);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/UnauthedLayout.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/components/UnauthedLayout.js";
 
 
 
@@ -4423,7 +4427,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9526);
 /* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8913);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/routes/LogList.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/debriefing/cond1-debriefing-ui/src/routes/LogList.js";
 
 
 
@@ -4898,1129 +4902,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "LogList": () => (/* reexport safe */ _LogList__WEBPACK_IMPORTED_MODULE_0__["default"])
 /* harmony export */ });
 /* harmony import */ var _LogList__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2727);
-
-
-/***/ }),
-
-/***/ 1604:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ AnalysesTable)
-/* harmony export */ });
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1412);
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8959);
-/* harmony import */ var _AnalysisTableHeader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5678);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/components/AnalysesTable.jsx";
-
-
-
-
-function AnalysesTable({
-  analyses,
-  onViewAnalysis,
-  onAnalyze
-}) {
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_2__["default"], {
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(_AnalysisTableHeader__WEBPACK_IMPORTED_MODULE_0__["default"], {}, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 9,
-        columnNumber: 9
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("tbody", {
-        children: analyses.length === 0 ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("tr", {
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-            colSpan: 5,
-            children: "There aren't any existing analyses"
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 13,
-            columnNumber: 15
-          }, this)
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 12,
-          columnNumber: 13
-        }, this) : analyses.map(analysis => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("tr", {
-          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-            children: analysis.id
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 18,
-            columnNumber: 17
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-            children: analysis.analyzer
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 19,
-            columnNumber: 17
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-            children: analysis.timestamp
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 20,
-            columnNumber: 17
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-            children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
-              size: "sm",
-              color: "primary",
-              onClick: () => onViewAnalysis(analysis.id),
-              children: "View"
-            }, void 0, false, {
-              fileName: _jsxFileName,
-              lineNumber: 22,
-              columnNumber: 19
-            }, this)
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 21,
-            columnNumber: 17
-          }, this)]
-        }, analysis.id, true, {
-          fileName: _jsxFileName,
-          lineNumber: 17,
-          columnNumber: 15
-        }, this))
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 10,
-        columnNumber: 9
-      }, this)]
-    }, void 0, true, {
-      fileName: _jsxFileName,
-      lineNumber: 8,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
-      size: "sm",
-      color: "primary",
-      onClick: () => onAnalyze(),
-      children: "Create New Analysis"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 35,
-      columnNumber: 7
-    }, this)]
-  }, void 0, true);
-}
-
-/***/ }),
-
-/***/ 2940:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ AnalysisDetails)
-/* harmony export */ });
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1412);
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8959);
-/* harmony import */ var _AnalysisTableHeader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5678);
-/* harmony import */ var _DebriefingsTable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3450);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/components/AnalysisDetails.jsx";
-
-
-
-
-
-function AnalysisDetails({
-  analysis,
-  cond1Comments,
-  cond2Debriefings,
-  onCond1StartReview,
-  onCond1ContinueReview,
-  onCond2StartReview,
-  onCond2ContinueReview
-}) {
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("h2", {
-      children: "Analysis"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 17,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
-      striped: true,
-      borderless: true,
-      size: "sm",
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(_AnalysisTableHeader__WEBPACK_IMPORTED_MODULE_0__["default"], {}, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 19,
-        columnNumber: 9
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("tbody", {
-        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("tr", {
-          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: analysis.id
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 22,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: analysis.analyzer
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 23,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: analysis.timestamp
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 24,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
-              size: "sm",
-              color: "danger",
-              children: "Delete"
-            }, void 0, false, {
-              fileName: _jsxFileName,
-              lineNumber: 26,
-              columnNumber: 15
-            }, this)
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 25,
-            columnNumber: 13
-          }, this)]
-        }, void 0, true, {
-          fileName: _jsxFileName,
-          lineNumber: 21,
-          columnNumber: 11
-        }, this)
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 20,
-        columnNumber: 9
-      }, this)]
-    }, void 0, true, {
-      fileName: _jsxFileName,
-      lineNumber: 18,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("br", {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 33,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("br", {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 34,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("br", {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 35,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(_DebriefingsTable__WEBPACK_IMPORTED_MODULE_1__["default"], {
-      analysis: analysis,
-      heading: "Condition 1 Debriefings/Comments",
-      debriefings: cond1Comments,
-      onStartReview: onCond1StartReview,
-      onContinueReview: onCond1ContinueReview
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 36,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("br", {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 43,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("br", {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 44,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("br", {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 45,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(_DebriefingsTable__WEBPACK_IMPORTED_MODULE_1__["default"], {
-      analysis: analysis,
-      heading: "Condition 2 Debriefings/Comments",
-      debriefings: cond2Debriefings,
-      onStartReview: onCond2StartReview,
-      onContinueReview: onCond2ContinueReview
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 46,
-      columnNumber: 7
-    }, this)]
-  }, void 0, true);
-}
-
-/***/ }),
-
-/***/ 5678:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ AnalysesTableHeader)
-/* harmony export */ });
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/components/AnalysisTableHeader.jsx";
-
-function AnalysesTableHeader() {
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("thead", {
-    children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("tr", {
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-        children: "ID"
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 5,
-        columnNumber: 17
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-        children: "Analyzer"
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 6,
-        columnNumber: 17
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-        children: "timestamp"
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 7,
-        columnNumber: 17
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {}, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 8,
-        columnNumber: 17
-      }, this)]
-    }, void 0, true, {
-      fileName: _jsxFileName,
-      lineNumber: 4,
-      columnNumber: 13
-    }, this)
-  }, void 0, false, {
-    fileName: _jsxFileName,
-    lineNumber: 3,
-    columnNumber: 9
-  }, this);
-}
-
-/***/ }),
-
-/***/ 3450:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ DebriefingsTable)
-/* harmony export */ });
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1412);
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8959);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/components/DebriefingsTable.jsx";
-
-
-
-function DebriefingsTable({
-  analysis,
-  heading,
-  debriefings,
-  onStartReview,
-  onContinueReview
-}) {
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("h3", {
-      children: heading
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 12,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_1__["default"], {
-      striped: true,
-      borderless: true,
-      size: "sm",
-      hover: true,
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("thead", {
-        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("tr", {
-          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-            children: "Debriefing ID"
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 16,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-            children: "Reviewer"
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 17,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-            children: "Timestamp"
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 18,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {}, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 19,
-            columnNumber: 13
-          }, this)]
-        }, void 0, true, {
-          fileName: _jsxFileName,
-          lineNumber: 15,
-          columnNumber: 11
-        }, this)
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 14,
-        columnNumber: 9
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("tbody", {
-        children: debriefings.length === 0 ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("tr", {
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-            colSpan: "4",
-            children: ["Currently, there aren't any ", heading.toLowerCase()]
-          }, void 0, true, {
-            fileName: _jsxFileName,
-            lineNumber: 25,
-            columnNumber: 15
-          }, this)
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 24,
-          columnNumber: 13
-        }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-          children: debriefings.map(debrief => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("tr", {
-            children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-              children: debrief.id
-            }, void 0, false, {
-              fileName: _jsxFileName,
-              lineNumber: 33,
-              columnNumber: 19
-            }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-              children: debrief.reviewer
-            }, void 0, false, {
-              fileName: _jsxFileName,
-              lineNumber: 34,
-              columnNumber: 19
-            }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-              children: debrief.timestamp
-            }, void 0, false, {
-              fileName: _jsxFileName,
-              lineNumber: 35,
-              columnNumber: 19
-            }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("td", {
-              children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_2__["default"], {
-                size: "sm",
-                color: "primary",
-                disabled: !onContinueReview,
-                onClick: () => onContinueReview(debrief.id),
-                children: "Continue Review"
-              }, void 0, false, {
-                fileName: _jsxFileName,
-                lineNumber: 37,
-                columnNumber: 21
-              }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_2__["default"], {
-                size: "sm",
-                color: "danger",
-                children: "Delete"
-              }, void 0, false, {
-                fileName: _jsxFileName,
-                lineNumber: 45,
-                columnNumber: 21
-              }, this)]
-            }, void 0, true, {
-              fileName: _jsxFileName,
-              lineNumber: 36,
-              columnNumber: 19
-            }, this)]
-          }, debrief.id, true, {
-            fileName: _jsxFileName,
-            lineNumber: 32,
-            columnNumber: 17
-          }, this))
-        }, void 0, false)
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 22,
-        columnNumber: 9
-      }, this)]
-    }, void 0, true, {
-      fileName: _jsxFileName,
-      lineNumber: 13,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_2__["default"], {
-      size: "sm",
-      color: "primary",
-      disabled: !onContinueReview,
-      onClick: () => onStartReview(analysis),
-      children: "Start Review"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 55,
-      columnNumber: 7
-    }, this)]
-  }, void 0, true);
-}
-
-/***/ }),
-
-/***/ 2603:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ObserverLogDetails)
-/* harmony export */ });
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1412);
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8959);
-/* harmony import */ var _ObserverLogTableHeader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1719);
-/* harmony import */ var _AnalysesTable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1604);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/components/ObserverLogDetails.jsx";
-
-
-
-
-
-function ObserverLogDetails({
-  log,
-  scenario,
-  analyses,
-  onViewAnalysis,
-  onAnalyze
-}) {
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("h1", {
-      children: "Observer Log"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 16,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
-      striped: true,
-      borderless: true,
-      size: "sm",
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(_ObserverLogTableHeader__WEBPACK_IMPORTED_MODULE_0__["default"], {}, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 18,
-        columnNumber: 9
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("tbody", {
-        children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("tr", {
-          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: log.scenarioName
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 21,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: log.label
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 22,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: log.userName
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 23,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: log.timestamp
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 24,
-            columnNumber: 13
-          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
-              size: "sm",
-              color: "danger",
-              children: "Delete"
-            }, void 0, false, {
-              fileName: _jsxFileName,
-              lineNumber: 26,
-              columnNumber: 15
-            }, this)
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 25,
-            columnNumber: 13
-          }, this)]
-        }, void 0, true, {
-          fileName: _jsxFileName,
-          lineNumber: 20,
-          columnNumber: 11
-        }, this)
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 19,
-        columnNumber: 9
-      }, this)]
-    }, void 0, true, {
-      fileName: _jsxFileName,
-      lineNumber: 17,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("h2", {
-      children: "Analyses"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 33,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(_AnalysesTable__WEBPACK_IMPORTED_MODULE_1__["default"], {
-      analyses: analyses,
-      onViewAnalysis: onViewAnalysis,
-      onAnalyze: onAnalyze
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 34,
-      columnNumber: 7
-    }, this)]
-  }, void 0, true);
-}
-
-/***/ }),
-
-/***/ 323:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ObserverLogTable)
-/* harmony export */ });
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1412);
-/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8959);
-/* harmony import */ var _ObserverLogTableHeader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1719);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/components/ObserverLogTable.jsx";
-// import { Link, use } from "react-router-dom"
-
-
-
-function ObserverLogTable({
-  logs,
-  viewButtonHandler
-}) {
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_2__["default"], {
-    striped: true,
-    borderless: true,
-    size: "sm",
-    hover: true,
-    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(_ObserverLogTableHeader__WEBPACK_IMPORTED_MODULE_0__["default"], {}, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 9,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("tbody", {
-      children: logs.map(log => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("tr", {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: log.scenario
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 13,
-          columnNumber: 13
-        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: log.label
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 14,
-          columnNumber: 13
-        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: log.userName
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 15,
-          columnNumber: 13
-        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: log.timestamp
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 16,
-          columnNumber: 13
-        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
-            size: "sm",
-            color: "success",
-            onClick: () => viewButtonHandler(log.id),
-            children: "View"
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 18,
-            columnNumber: 15
-          }, this)
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 17,
-          columnNumber: 13
-        }, this)]
-      }, log.id, true, {
-        fileName: _jsxFileName,
-        lineNumber: 12,
-        columnNumber: 11
-      }, this))
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 10,
-      columnNumber: 7
-    }, this)]
-  }, void 0, true, {
-    fileName: _jsxFileName,
-    lineNumber: 8,
-    columnNumber: 5
-  }, this);
-}
-
-/***/ }),
-
-/***/ 1719:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ObserverLogTableHeader)
-/* harmony export */ });
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/components/ObserverLogTableHeader.jsx";
-
-function ObserverLogTableHeader() {
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("thead", {
-    children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("tr", {
-      children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
-        children: "Scenario"
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 5,
-        columnNumber: 21
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
-        children: "Label"
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 6,
-        columnNumber: 21
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
-        children: "Username"
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 7,
-        columnNumber: 21
-      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
-        children: "Timestamp"
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 8,
-        columnNumber: 21
-      }, this)]
-    }, void 0, true, {
-      fileName: _jsxFileName,
-      lineNumber: 4,
-      columnNumber: 17
-    }, this)
-  }, void 0, false, {
-    fileName: _jsxFileName,
-    lineNumber: 3,
-    columnNumber: 9
-  }, this);
-}
-
-/***/ }),
-
-/***/ 8573:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ObserverLogDetails": () => (/* reexport safe */ _ObserverLogDetails__WEBPACK_IMPORTED_MODULE_0__["default"]),
-/* harmony export */   "ObserverLogTable": () => (/* reexport safe */ _ObserverLogTable__WEBPACK_IMPORTED_MODULE_1__["default"]),
-/* harmony export */   "ObserverLogTableHeader": () => (/* reexport safe */ _ObserverLogTableHeader__WEBPACK_IMPORTED_MODULE_2__["default"])
-/* harmony export */ });
-/* harmony import */ var _ObserverLogDetails__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2603);
-/* harmony import */ var _ObserverLogTable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(323);
-/* harmony import */ var _ObserverLogTableHeader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1719);
-
-
-
-
-/***/ }),
-
-/***/ 9834:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "LogChooser": () => (/* reexport safe */ _routes__WEBPACK_IMPORTED_MODULE_2__.LogChooser),
-/* harmony export */   "ObserverLog": () => (/* reexport safe */ _routes__WEBPACK_IMPORTED_MODULE_2__.ObserverLog),
-/* harmony export */   "ObserverLogDetails": () => (/* reexport safe */ _components__WEBPACK_IMPORTED_MODULE_1__.ObserverLogDetails),
-/* harmony export */   "ObserverLogList": () => (/* reexport safe */ _routes__WEBPACK_IMPORTED_MODULE_2__.ObserverLogList),
-/* harmony export */   "ObserverLogTable": () => (/* reexport safe */ _components__WEBPACK_IMPORTED_MODULE_1__.ObserverLogTable),
-/* harmony export */   "ObserverLogTableHeader": () => (/* reexport safe */ _components__WEBPACK_IMPORTED_MODULE_1__.ObserverLogTableHeader)
-/* harmony export */ });
-/* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8080);
-/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8573);
-/* harmony import */ var _routes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3345);
-
-
-
-
-/***/ }),
-
-/***/ 8429:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ Analysis)
-/* harmony export */ });
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5735);
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6886);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2784);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(7267);
-/* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9526);
-/* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8913);
-/* harmony import */ var _components_AnalysisDetails__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(2940);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/routes/Analysis.jsx";
-
-
-
-
- // import { AuthContext } from "@meddbriefer/mdb-auth";
-
-
-
-
-function Analysis({
-  onCond1StartReview = null,
-  onCond1ContinueReview = null,
-  onCond2StartReview = null,
-  onCond2ContinueReview = null
-}) {
-  const {
-    db
-  } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__.useFirebase)();
-  const {
-    logID,
-    analysisID
-  } = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_7__.useParams)(); // const history = useHistory();
-  // const { userName } = useContext(AuthContext);
-
-  const [analysis, setAnalysis] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
-  const [cond1DebLogs, setCond1DebLogs] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
-  const [cond2DebLogs, setCond2DebLogs] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
-  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    if (db && !analysis) {
-      (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getAnalysisLog)(db, analysisID).then(data => setAnalysis(data)).then(() => (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getAnalysisCond1Comments)(db, analysisID)).then(comments => setCond1DebLogs(comments)).then(() => (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getAnalysisCond2Debriefings)(db, analysisID)).then(debriefings => setCond2DebLogs(debriefings)).catch(error => console.error(error));
-    }
-  }, [db, logID, analysisID, analysis]);
-
-  if (!(cond1DebLogs && cond2DebLogs)) {
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)("div", {
-      children: "Loading..."
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 48,
-      columnNumber: 12
-    }, this);
-  }
-
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)(_components_AnalysisDetails__WEBPACK_IMPORTED_MODULE_5__["default"], {
-    analysis: analysis,
-    cond1Comments: cond1DebLogs,
-    cond2Debriefings: cond2DebLogs,
-    onCond1StartReview: onCond1StartReview,
-    onCond1ContinueReview: onCond1ContinueReview,
-    onCond2StartReview: onCond2StartReview,
-    onCond2ContinueReview: onCond2ContinueReview
-  }, void 0, false, {
-    fileName: _jsxFileName,
-    lineNumber: 51,
-    columnNumber: 5
-  }, this);
-}
-
-/***/ }),
-
-/***/ 2474:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ LogChooser)
-/* harmony export */ });
-/* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3439);
-/* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2784);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(7267);
-/* harmony import */ var _meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6011);
-/* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9526);
-/* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8913);
-/* harmony import */ var _ObserverLogList__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(4953);
-/* harmony import */ var _ObserverLog__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5786);
-/* harmony import */ var _Analysis__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(8429);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/routes/LogChooser.jsx";
-
-
-
-
-
-
-
-
-
-
-function LogChooser({
-  redirectToCond1Debriefing,
-  redirectToCond2Debriefing
-}) {
-  const {
-    db
-  } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__.useFirebase)();
-  const {
-    userName
-  } = (0,react__WEBPACK_IMPORTED_MODULE_1__.useContext)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_2__.AuthContext);
-
-  const continueCond1ReviewHandler = debriefingID => redirectToCond1Debriefing(debriefingID);
-
-  const startCond1ReviewHandler = async analysis => {
-    console.log("I will creating a new review doc and redirect to it", analysis);
-    const debriefID = await (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.createCond1Comments)(db, analysis, userName);
-    redirectToCond1Debriefing(debriefID);
-  };
-
-  const continueCond2ReviewHandler = debriefID => redirectToCond2Debriefing(debriefID);
-
-  const startCond2ReviewHandler = async analysis => {
-    console.log("I will creating a new review doc and redirect to it", analysis);
-    const debriefID = await (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.createCond2Debriefing)(db, analysis, userName);
-    redirectToCond2Debriefing(debriefID);
-  };
-
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Switch, {
-    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Route, {
-      path: "/logs/:logID/analysis/:analysisID",
-      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(_Analysis__WEBPACK_IMPORTED_MODULE_7__["default"], {
-        onCond1StartReview: !redirectToCond1Debriefing ? null : startCond1ReviewHandler,
-        onCond1ContinueReview: !redirectToCond1Debriefing ? null : continueCond1ReviewHandler,
-        onCond2StartReview: !redirectToCond2Debriefing ? null : startCond2ReviewHandler,
-        onCond2ContinueReview: !redirectToCond2Debriefing ? null : continueCond2ReviewHandler
-      }, void 0, false, {
-        fileName: _jsxFileName,
-        lineNumber: 39,
-        columnNumber: 9
-      }, this)
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 38,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Route, {
-      path: "/logs/:logID",
-      component: _ObserverLog__WEBPACK_IMPORTED_MODULE_6__["default"]
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 46,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_8__.jsxDEV)(react_router_dom__WEBPACK_IMPORTED_MODULE_9__.Route, {
-      exact: true,
-      path: "/",
-      component: _ObserverLogList__WEBPACK_IMPORTED_MODULE_5__["default"]
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 47,
-      columnNumber: 7
-    }, this)]
-  }, void 0, true, {
-    fileName: _jsxFileName,
-    lineNumber: 37,
-    columnNumber: 5
-  }, this);
-}
-
-/***/ }),
-
-/***/ 5786:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ObserverLog)
-/* harmony export */ });
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5735);
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6886);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3439);
-/* harmony import */ var core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_promise_js__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2784);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(7267);
-/* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9526);
-/* harmony import */ var _meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6011);
-/* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(8913);
-/* harmony import */ var _meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(4303);
-/* harmony import */ var _components_ObserverLogDetails__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(2603);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/routes/ObserverLog.jsx";
-
-
-
-
-
-
-
-
-
-
-
-function ObserverLog() {
-  const {
-    db
-  } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_4__.useFirebase)();
-  const history = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_10__.useHistory)();
-  const {
-    logID
-  } = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_10__.useParams)();
-  const {
-    userName
-  } = (0,react__WEBPACK_IMPORTED_MODULE_3__.useContext)(_meddbriefer_mdb_auth__WEBPACK_IMPORTED_MODULE_5__.AuthContext);
-  const [obsLog, setObsLog] = (0,react__WEBPACK_IMPORTED_MODULE_3__.useState)(null);
-  const [scenario, setScenario] = (0,react__WEBPACK_IMPORTED_MODULE_3__.useState)(null);
-  const [analysisLogs, setAnalysisLogs] = (0,react__WEBPACK_IMPORTED_MODULE_3__.useState)(null); // const [debriefings, setDebriefings] = useState(null)
-  // const [doneLoading, setDoneLoading] = useState(false)
-
-  const [updateAnalysisLogs, setUpdateAnalysisLogs] = (0,react__WEBPACK_IMPORTED_MODULE_3__.useState)(true);
-
-  const analyzeLogHandler = async () => {
-    // console.log("I will analyze now")
-    const analysis = (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_7__.analyzeEvents)(scenario, obsLog); // console.log(userName, analysis)
-
-    await (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_7__.saveAnalysisLog)(db, obsLog, analysis, userName, _meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_7__.requiredPhaseNames);
-    setUpdateAnalysisLogs(true);
-  };
-
-  const viewAnalysisHandler = analysisID => {
-    history.push(`/logs/${logID}/analysis/${analysisID}`);
-  };
-
-  (0,react__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
-    (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_6__.getLog)(db, logID).then(obsLogData => {
-      setObsLog(obsLogData);
-      return obsLogData;
-    }).then(log => (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_6__.getPublishedScenarioObjectByID)(db, log.scenarioID)).then(scenData => setScenario(scenData)).catch(error => console.error(error));
-  }, [db, logID]);
-  (0,react__WEBPACK_IMPORTED_MODULE_3__.useEffect)(() => {
-    if (obsLog && scenario && updateAnalysisLogs) {
-      setUpdateAnalysisLogs(false);
-      (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_6__.getObserverLogAnalyses)(db, logID).then(records => setAnalysisLogs(records)).catch(error => console.error(error));
-    }
-  }, [db, logID, obsLog, scenario, updateAnalysisLogs]);
-
-  if (!analysisLogs) {
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)("div", {
-      children: "Loading.."
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 64,
-      columnNumber: 12
-    }, this);
-  }
-
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_9__.jsxDEV)(_components_ObserverLogDetails__WEBPACK_IMPORTED_MODULE_8__["default"], {
-    log: obsLog,
-    scenario: scenario,
-    analyses: analysisLogs,
-    onAnalyze: analyzeLogHandler,
-    onViewAnalysis: viewAnalysisHandler
-  }, void 0, false, {
-    fileName: _jsxFileName,
-    lineNumber: 67,
-    columnNumber: 5
-  }, this);
-}
-
-/***/ }),
-
-/***/ 4953:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ObserverLogList)
-/* harmony export */ });
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5735);
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6886);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2784);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(7267);
-/* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9526);
-/* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8913);
-/* harmony import */ var _components_ObserverLogTable__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(323);
-/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/debriefing/log-chooser/src/routes/ObserverLogList.jsx";
-
-
-
-
-
-
-
-
-
-function ObserverLogList() {
-  const {
-    db
-  } = (0,_meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_3__.useFirebase)();
-  const history = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_7__.useHistory)();
-  const [obsLogs, setObsLogs] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null);
-
-  const viewObsLogHandler = obsLogID => {
-    history.push(`/logs/${obsLogID}`);
-  };
-
-  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(() => {
-    (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_4__.getObserverLogList)(db).then(logs => setObsLogs(logs)).catch(error => console.error(error));
-  }, [db]);
-
-  if (!obsLogs) {
-    return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)("div", {
-      children: "Loading Logs"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 24,
-      columnNumber: 12
-    }, this);
-  }
-
-  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)("h1", {
-      children: "Observer Logs"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 28,
-      columnNumber: 7
-    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxDEV)(_components_ObserverLogTable__WEBPACK_IMPORTED_MODULE_5__["default"], {
-      logs: obsLogs,
-      viewButtonHandler: viewObsLogHandler
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 29,
-      columnNumber: 7
-    }, this)]
-  }, void 0, true);
-}
-
-/***/ }),
-
-/***/ 3345:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Analysis": () => (/* reexport safe */ _Analysis__WEBPACK_IMPORTED_MODULE_3__["default"]),
-/* harmony export */   "LogChooser": () => (/* reexport safe */ _LogChooser__WEBPACK_IMPORTED_MODULE_0__["default"]),
-/* harmony export */   "ObserverLog": () => (/* reexport safe */ _ObserverLog__WEBPACK_IMPORTED_MODULE_1__["default"]),
-/* harmony export */   "ObserverLogList": () => (/* reexport safe */ _ObserverLogList__WEBPACK_IMPORTED_MODULE_2__["default"])
-/* harmony export */ });
-/* harmony import */ var _LogChooser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2474);
-/* harmony import */ var _ObserverLog__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5786);
-/* harmony import */ var _ObserverLogList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4953);
-/* harmony import */ var _Analysis__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8429);
-
-
-
 
 
 /***/ }),
@@ -10214,7 +9095,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _EmailVerification__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(7650);
 /* harmony import */ var _styles_auth_styles_module_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(4292);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/components/AuthFlow.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/components/AuthFlow.js";
 
 
 
@@ -10298,7 +9179,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_auth_styles_module_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4292);
 /* harmony import */ var _contexts_Auth__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5600);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/components/EmailVerification.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/components/EmailVerification.js";
 
 
 
@@ -10436,7 +9317,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _contexts_Auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5600);
 /* harmony import */ var _styles_auth_styles_module_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4292);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/components/ForgotPasswordForm.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/components/ForgotPasswordForm.js";
 
 
 
@@ -10601,7 +9482,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_auth_styles_module_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(4292);
 /* harmony import */ var _icons_PasswordVisibilityIcon__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(3391);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/components/LoginForm.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/components/LoginForm.js";
 
 
 
@@ -10826,7 +9707,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _contexts_Auth__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5600);
 /* harmony import */ var _icons_PasswordVisibilityIcon__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(3391);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/components/RegistrationForm.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/components/RegistrationForm.js";
 
 
 
@@ -11094,7 +9975,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _styles_auth_styles_module_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4292);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/components/icons/PasswordVisibilityIcon.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/components/icons/PasswordVisibilityIcon.js";
 
 
 
@@ -11138,7 +10019,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _meddbriefer_mdb_firebase__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9526);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9663);
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/contexts/Auth.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/contexts/Auth.js";
 
 
 
@@ -11370,7 +10251,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Users_sts125_projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1461);
+/* harmony import */ var _Users_user_Projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1461);
 /* harmony import */ var core_js_modules_es_object_assign_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3105);
 /* harmony import */ var core_js_modules_es_object_assign_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_assign_js__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2784);
@@ -11381,7 +10262,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9663);
 
 const _excluded = ["component", "authFlowLayout"];
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/routes/PrivateRoute.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/routes/PrivateRoute.js";
 
 
 /* eslint-disable no-extra-boolean-cast */
@@ -11396,7 +10277,7 @@ const PrivateRoute = _ref => {
     component: RouteComponent,
     authFlowLayout: Layout
   } = _ref,
-      rest = (0,_Users_sts125_projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_ref, _excluded);
+      rest = (0,_Users_user_Projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_ref, _excluded);
 
   const {
     emailVerified
@@ -11469,7 +10350,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Users_sts125_projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1461);
+/* harmony import */ var _Users_user_Projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1461);
 /* harmony import */ var core_js_modules_es_object_assign_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3105);
 /* harmony import */ var core_js_modules_es_object_assign_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_assign_js__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2784);
@@ -11480,7 +10361,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9663);
 
 const _excluded = ["component", "authFlowLayout"];
-var _jsxFileName = "/Users/sts125/projects/monorepo/libs/mdb-auth/src/lib/routes/StaffRoute.js";
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-auth/src/lib/routes/StaffRoute.js";
 
 
 
@@ -11507,7 +10388,7 @@ const StaffRoute = _ref => {
     component: RouteComponent,
     authFlowLayout: Layout
   } = _ref,
-      rest = (0,_Users_sts125_projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_ref, _excluded);
+      rest = (0,_Users_user_Projects_monorepo_node_modules_babel_runtime_helpers_esm_objectWithoutPropertiesLoose_js__WEBPACK_IMPORTED_MODULE_0__["default"])(_ref, _excluded);
 
   const {
     isAuthenticated,
@@ -11887,7 +10768,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "getCollection": () => (/* binding */ getCollection),
 /* harmony export */   "getCond1CommentLog": () => (/* binding */ getCond1CommentLog),
 /* harmony export */   "getCond1CommentLogs": () => (/* binding */ getCond1CommentLogs),
-/* harmony export */   "getCond2DebriefingLog": () => (/* binding */ getCond2DebriefingLog),
 /* harmony export */   "getDebriefCommentLog": () => (/* binding */ getDebriefCommentLog),
 /* harmony export */   "getDebriefCommentLogs": () => (/* binding */ getDebriefCommentLogs),
 /* harmony export */   "getDebriefLog": () => (/* binding */ getDebriefLog),
@@ -12544,15 +11424,6 @@ const getCond1CommentLog = (db, logID) => {
   }).catch(error => {
     console.error(error);
     return null;
-  });
-};
-const getCond2DebriefingLog = (db, debriefingID) => {
-  return db.collection("cond2-debriefings").doc(debriefingID).get().then(doc => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      ...data
-    };
   });
 };
 const getObserverLog = (db, logID) => {
