@@ -400,7 +400,8 @@ const annotateInputEvents = (events, problems) => {
     } // copy over the event fields that exist in the input log from observer UI (which is type dependent)
 
 
-    const EVENT_FIELDS = ["id", "interventionID", "intvVariant", "label", "finding", "phase", "subPhase", "vitalType", "vital", "value", "type", "prompt", "promptID", "intervention", "timestamp", "probLabel"];
+    const EVENT_FIELDS = ["id", "interventionID", //"intvVariant",  //ignoring intvVariant for now until questions resolved 8/10/22
+    "label", "finding", "phase", "subPhase", "vitalType", "vital", "value", "type", "prompt", "promptID", "intervention", "timestamp", "probLabel"];
     EVENT_FIELDS.forEach(fldName => {
       if (!!event[fldName]) {
         eventObj[fldName] = event[fldName];
@@ -1831,19 +1832,21 @@ function findBestSolMatch(prob, confirmedEvents) {
   solutions.forEach((sol, j) => {
     let solVal;
     sol.found = [];
-    sol.notFound = [];
-    let variant;
-    sol.actions.forEach((action, f) => {
-      if (!!action.interventionVariant) {
-        variant = (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_0__.intvVariant2JSON)(action.interventionVariant);
-      } else {
-        variant = "{}";
-      }
+    sol.notFound = []; //let variant   //commenting out until variant questions resolved 8/10/22
 
+    let variant = "{}";
+    sol.actions.forEach((action, f) => {
+      //commenting out until variant questions resolved 8/10/22
+
+      /* if (!!action.interventionVariant){  
+          variant = intvVariant2JSON(action.interventionVariant)}
+      else {variant = "{}"} */
       if (confirmedEvents.includes(action.id + "+" + variant)) {
         sol.found.push(action.id);
       } else {
-        sol.notFound.push(action);
+        if (!action.protocolRelationship.includes("optional")) {
+          sol.notFound.push(action);
+        }
       }
     });
     let solLen = sol.actions.length;
@@ -1879,15 +1882,15 @@ function findBestSolMatch(prob, confirmedEvents) {
   let fSol = solutions[finalIndex];
 
   if (fSol.altActions.length !== 0) {
-    let variant;
+    //let variant  //commenting out until variant questions resolved 8/10/22
+    let variant = "{}";
 
     for (let action of fSol.altActions) {
-      if (!!action.interventionVariant) {
-        variant = (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_0__.intvVariant2JSON)(action.interventionVariant);
-      } else {
-        variant = "{}";
-      }
+      //commenting out until variant questions resolved 8/10/22
 
+      /* if (!!action.interventionVariant){
+          variant = intvVariant2JSON(action.interventionVariant)}
+      else {variant = "{}"} */
       if (confirmedEvents.includes(action.id + "+" + variant)) {
         foundOneAltAction = true;
         break;
@@ -1911,11 +1914,11 @@ const insertMissingInterventions = (problems, confirmedEvents, indexCounter, pha
     let actions = sol.notFound;
     let variant;
     actions.forEach((action, k) => {
-      if (!!action.interventionVariant) {
-        variant = (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_0__.intvVariant2JSON)(action.interventionVariant);
-      } else {
-        variant = "{}";
-      }
+      //commenting out until variant questions resolved 8/10/22
+      variant = "{}";
+      /* if (!!action.interventionVariant){
+          variant = intvVariant2JSON(action.interventionVariant)}
+      else {variant = "{}"} */
 
       confirmedEvents.push(action.id + "+" + variant);
       let phaseObject = {
@@ -8792,9 +8795,7 @@ This data structure holds all the information to create the slides to present du
 It mirrors the tree structure that is presented in the Excel file. All nodes in the tree are called actions whether 
 they are assessments or interventions. Subactions are the children of the actions in the tree.
 Fields:
-id: identifies the action-node in the tree. Since there could be more than one appropriate action for a node 
-(e.g., "insert a basic airway adjunct" can be fullfilled by intv-oropharyngeal-airway or intv-nasopharyngeal-airway)
-the filed id will be an array of text ids.
+id: identifies the action-node in the tree. It is a string since it is unique.
 label: text for the action as it will appear on the slide
 type: indicates whether the action is Required, Contraindicated, Unnecessary or Irrelevant.
     Required, it will be listed in the left side of the slide so that students are asked if they performed it.
@@ -10262,21 +10263,44 @@ const SC8CP_PhaseIE = {
       type: "Required",
       feedbackAbsent: [""],
       feedbackOutOfOrder: [""],
-      feedbackErrors: [""],
+      feedbackErrors: ["How to transfer your patient to the stretcher depends on your level of concern for spinal injury but you should do so with minimal movement to the spine", "Given the low concern for further spinal injury (i.e. the patient was unlikely to have been diving), you could carefully place him directly on the stretcher, with manual c-spine stabilization and a c-collar in place. Alternately, you could use a backboard, scoop stretcher, vacuum mattress, or other device which could be removed after placing the patient on the stretcher.", "Supine position will be required for this patient as he is intubated and in order to properly position the airway."],
       examine: false,
       prompts: "",
       subActionsList: true,
       subActions: [{
-        id: "intv-transfer",
-        label: "Transfer the patient directly to the stretcher, or secure the patient on an immobilzation device before transferring him to a stretcher",
+        id: "intv-place-on-stretcher-OR-immob-device",
+        label: "Transfer the patient directly to the stretcher or by first placing him on an immobilization or transfer device.",
         type: "Required",
         feedbackAbsent: [""],
         feedbackOutOfOrder: [""],
-        feedbackErrors: ["How to transfer your patient to the stretcher depends on your level of concern for spinal injury but you should do so with minimal movement to the spine. You may use a backboard, scoop stretcher, vacuum mattress, or other device.", "Supine position will be required for this patient as he is intubated and in order to properly position the airway."],
+        feedbackErrors: ["How to transfer your patient to the stretcher depends on your level of concern for spinal injury but you should do so with minimal movement to the spine", "Given the low concern for further spinal injury (i.e. the patient was unlikely to have been diving), you could carefully place him directly on the stretcher, with manual c-spine stabilization and a c-collar in place. Alternately, you could use a backboard, scoop stretcher, vacuum mattress, or other device which could be removed after placing the patient on the stretcher.", "Supine position will be required for this patient as he is intubated and in order to properly position the airway."],
         examine: false,
         prompts: "",
         subActionsList: false,
-        subActions: []
+        subActions: [{
+          id: "intv-place-directly-on-stretcher",
+          label: "Transfer the patient directly to a stretcher",
+          type: "Required",
+          feedbackAbsent: [""],
+          feedbackOutOfOrder: [""],
+          feedbackErrors: ["How to transfer your patient to the stretcher depends on your level of concern for spinal injury but you should do so with minimal movement to the spine", "Given the low concern for further spinal injury (i.e. the patient was unlikely to have been diving), you could carefully place him directly on the stretcher, with manual c-spine stabilization and a c-collar in place. Alternately, you could use a backboard, scoop stretcher, vacuum mattress, or other device which could be removed after placing the patient on the stretcher.", "Supine position will be required for this patient as he is intubated and in order to properly position the airway."],
+          examine: false,
+          prompts: "",
+          subActionsList: false,
+          subActions: []
+        }, {
+          id: "intv-place-on-immobilization-device",
+          label: "Transfer patient by first placing him on immobilization device",
+          type: "Alternative",
+          alternativeToIntv: "intv-place-directly-on-stretcher",
+          feedbackAbsent: [""],
+          feedbackOutOfOrder: [""],
+          feedbackErrors: ["How to transfer your patient to the stretcher depends on your level of concern for spinal injury but you should do so with minimal movement to the spine", "Given the low concern for further spinal injury (i.e. the patient was unlikely to have been diving), you could carefully place him directly on the stretcher, with manual c-spine stabilization and a c-collar in place. Alternately, you could use a backboard, scoop stretcher, vacuum mattress, or other device which could be removed after placing the patient on the stretcher.", "Supine position will be required for this patient as he is intubated and in order to properly position the airway."],
+          examine: false,
+          prompts: "",
+          subActionsList: false,
+          subActions: []
+        }]
       }, {
         id: "intv-spinal-immobilization-technique-transfer-to-device",
 
