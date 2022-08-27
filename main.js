@@ -171,6 +171,7 @@ let subPhases = {}; // list of all subphase IDs
 let requiredSubphases;
 let requiredPhaseNames = [];
 let requiredPhaseAndSubPhases;
+let phaseRequiredAtEnd;
 let scenario; //let version
 
 let phaseFB;
@@ -186,6 +187,7 @@ let analysisFields = ["numericalID", "actionDescription", "id", "type", "label",
 function initGlobals(scen) {
   problemStates = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.getStatesForStatus)("Problem", _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_2__.fbTemplatesDef);
   cautionStates = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.getStatesForStatus)("Caution", _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_2__.fbTemplatesDef);
+  phaseRequiredAtEnd = "ongoing-mgmt-plan";
   scenario = scen;
   (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.initializeConstraints)(scen.name);
   getPromptIDs(scenario);
@@ -295,11 +297,16 @@ const insertMissingSubphases = (phases, phaseNames) => {
   let priorPh;
   requiredPhaseAndSubPhases.forEach((phase, i) => {
     if (!phaseNames.includes(phase)) {
-      //find last index for phase before and splice that
-      if (i === 0) {
-        priorPh = requiredPhaseAndSubPhases[0];
+      if (phase === phaseRequiredAtEnd) {
+        //needs special handling to be placed last 
+        priorPh = requiredPhaseAndSubPhases[requiredPhaseAndSubPhases.length - 2];
       } else {
-        priorPh = requiredPhaseAndSubPhases[i - 1];
+        //find last index for phase before and splice that
+        if (i === 0) {
+          priorPh = requiredPhaseAndSubPhases[0];
+        } else {
+          priorPh = requiredPhaseAndSubPhases[i - 1];
+        }
       }
 
       let insertionIndex = 0;
@@ -370,7 +377,6 @@ const annotateInputEvents = (events, problems) => {
       "minimalWhy": "",
       "why": "",
       "answerCorrect": "false",
-      //"answerCorrect": true,
       "answerDetails": {},
       "expertPhase": "",
       //filled in only for interventions
@@ -882,13 +888,8 @@ const storeMisOrderedFB = (numericalID, lateArg, FB, constraintType, phases, pha
         objToModify.orderingFB = FB;
       }
 
-      let status; //let appendString = ""
-
+      let status;
       let appendString = "misOrdered-";
-      /* if (constraintType === "phase"){
-          appendString = "misOrdered-phase-"}
-      if (constraintType === "item"){
-          appendString = "misOrdered-"} */
 
       if (!objToModify.status.includes(appendString)) {
         status = appendString + objToModify.status;
@@ -1284,7 +1285,8 @@ const checkForMissingAssessments = (problems, events, confirmedEvents, phaseName
         phaseObject.status = "missingRequiredAssessment";
       }
 
-      insertInPhaseInOrder(phaseNames, phases, phaseObject, i);
+      insertInPhaseRelativeToSuggestedOrder(phaseNames, phases, phaseObject, checklistSteps, i, confirmedEvents); //insertInPhaseInOrder(phaseNames, phases, phaseObject, i);
+
       indexCounter++;
     }
   });
@@ -1304,7 +1306,7 @@ const insertInPhaseInOrder = (phaseNames, phases, object, objIndex) => {
     phaseObjects = [];
   }
 
-  phaseObjects.splice(objIndex - 1, 0, object); //insert it at the place indicated by input objIndex
+  phaseObjects.splice(objIndex, 0, object); //insert it at the place indicated by input objIndex
 
   phases[phaseIndex] = phaseObjects;
 };
@@ -1370,13 +1372,10 @@ const findHeaderFor = (numericalID, log) => {
 
 
 const setupProblems = (defs, sols, actions) => {
-  let problems = []; //version = "post 5/1/22"
+  let problems = [];
 
   for (let problemDef of defs) {
-    let problem = {}; //new interface
-    //if (!!sols && !!actions){
-    //version = "post 5/1/22"
-
+    let problem = {};
     let solutionIDs = problemDef.solutions;
     let probSols = sols.filter(sol => sol.problemID === problemDef.id);
     problem.probLabel = problemDef.label;
@@ -1399,6 +1398,7 @@ const setupProblems = (defs, sols, actions) => {
       let actEntries;
       let actIDs = sol.actions;
       actEntries = actions.filter(act => actIDs.includes(act.id));
+      solution.actionsInSuggestedOrder = actEntries.filter(act => ["alternative", "required", "minimal", "optional"].includes(act.protocolRelationship));
 
       for (let entry of actEntries) {
         let act = Object.assign({}, entry);
@@ -1441,37 +1441,7 @@ const setupProblems = (defs, sols, actions) => {
       }
 
       problem.solutions.push(solution);
-    } //}
-    // old interface but only expects one solution
-
-    /* else {
-        version = "pre 5/1/22"
-        let solutionID = problemDef.solutions[0];
-        let solution = Object.assign({})
-        problem.probLabel = problemDef.problem;
-        problem.lifeThreat = problemDef.lifeThreat
-        problem.allActions = []
-        problem.allContras = []
-        solution.actions = solutionID.actions;
-        solution.minimalWhy = solutionID.minimalWhy;
-        solution.protocols = solutionID.protocols
-        problem.assessments = problemDef.assessments;
-        problem.solutions = []
-        solution.otherActions = solutionID.contraindications;
-        solution.actions.forEach(act => {
-            pushNew(act, problem.allActions)  //need to be able to annotate an action without deciding yet on which solution under
-            act.probLabel = problem.probLabel
-            if (act.minimal){act.protocolRelationship = "minimal"}
-            if (act.optional){act.protocolRelationship = "optional"}
-            if (!act.minimal && !act.optional){act.protocolRelationship = "required"}})
-        solution.otherActions.forEach(act => {  //need to be able to annotate an action without deciding yet to which solution under
-                pushNew(act, problem.allContras)
-                act.protocolRelationship = "contraindicated"})
-         problem.solutions.push(solution)
-        //not in new interface
-        problem.allProblemProtocols = problemDef.protocol;
-         } */
-
+    }
 
     problems.push(problem);
   }
@@ -1488,7 +1458,7 @@ const setupProblems = (defs, sols, actions) => {
 // objIndex is the index in orderedArrayObjects for the intervention object that needs to be inserted in phases
 
 
-const insertInPhaseRelativeToSuggestedOrder = (phaseNames, phases, object, orderedArrayObjects, objIndex) => {
+const insertInPhaseRelativeToSuggestedOrder = (phaseNames, phases, object, orderedArrayObjects, objIndex, confirmedEvents) => {
   // if expertPhase in object is a phase then find the last subphase and insert there instead of at the beginning
   let phaseIndex = -1; // if it is a subphase or a phase with no subphases then get the last entry for a proposed initial insertion point
   // object.expertPhase is the phase recommended for this action to appear
@@ -1503,18 +1473,44 @@ const insertInPhaseRelativeToSuggestedOrder = (phaseNames, phases, object, order
   if (requiredSubphases.includes(object.expertPhase) || !getSubPhases(object.expertPhase)) {
     phaseIndex = phaseNames.lastIndexOf(object.expertPhase);
   } // if it is a phase then get the last entry of the last suphase within it for a proposed intial insertion point
+  // for an intervention but if it is an assessment suggest goes in the first instance of the phase at the end of 
+  // that phase
   else {
     phaseIndex = getEndSubPhaseIndex(object.expertPhase, phaseNames);
+  }
+  /* if(["assessment", "required-action", "assessment-option"].includes(object.type)){
+      phaseIndex = getFirstSubPhaseIndex(object.expertPhase, phaseNames)}
+  else {phaseIndex = getEndSubPhaseIndex(object.expertPhase, phaseNames);}} */
+
+
+  if (object.expertPhase === phaseRequiredAtEnd && phaseNames.length - 1 !== phaseIndex) {
+    //add a phase ongoing management at the end
+    phaseIndex = phaseNames.length;
+    phaseNames[phaseIndex] = phaseRequiredAtEnd;
+    phases[phaseIndex] = [];
   } //update object when field which is mostly to see what gets computed for the insertion point
 
 
   object.when = phaseNames[phaseIndex];
-  let objectsBefore = orderedArrayObjects.slice(0, objIndex - 1);
-  let objectBefore = orderedArrayObjects[objIndex - 1];
-  let requiredObjectBefore = [...objectsBefore].reverse().find(entry => entry.required);
-  let objectAfter = orderedArrayObjects[objIndex + 1];
-  let objectsAfter = orderedArrayObjects.slice(objIndex + 1);
-  let requiredObjectAfter = objectsAfter.find(entry => entry.required); //let phaseIndex = phaseNames.lastIndexOf(object.expertPhase);
+  let objectsBefore;
+  let objectBefore;
+  let requiredObjectBefore;
+
+  if (objIndex !== 0) {
+    objectsBefore = orderedArrayObjects.slice(0, objIndex);
+    objectBefore = [...objectsBefore].reverse().find(entry => confirmedEvents.includes(entry.id) || confirmedEvents.includes(entry.interventionID));
+    requiredObjectBefore = objectsBefore.find(entry => ["required", "alternative"].includes(entry.protocolRelationship) && confirmedEvents.includes(entry.interventionID));
+  }
+
+  let objectAfter;
+  let objectsAfter;
+  let requiredObjectAfter;
+
+  if (objIndex !== orderedArrayObjects.length - 1) {
+    objectsAfter = orderedArrayObjects.slice(objIndex + 1);
+    objectAfter = [...objectsAfter].find(entry => confirmedEvents.includes(entry.id) || confirmedEvents.includes(entry.interventionID));
+    requiredObjectAfter = objectsAfter.find(entry => ["required", "alternative"].includes(entry.protocolRelationship) && confirmedEvents.includes(entry.interventionID));
+  }
 
   let phaseObjects = [...phases[phaseIndex]]; //trying for a deep copy of the array mainly for debug via console.log
 
@@ -1525,59 +1521,57 @@ const insertInPhaseRelativeToSuggestedOrder = (phaseNames, phases, object, order
   let insertionIndex = false;
 
   if (objectBefore) {
-    indexBefore = phaseObjects.findIndex(entry => entry.id === objectBefore.id);
+    indexBefore = phaseObjects.findIndex(entry => entry.id === objectBefore.id || entry.id === objectBefore.interventionID);
   }
 
   if (objectAfter) {
-    indexAfter = phaseObjects.findIndex(entry => entry.id === objectAfter.id);
+    indexAfter = phaseObjects.findIndex(entry => entry.id === objectAfter.id || entry.id === objectAfter.interventionID);
   }
 
   if (requiredObjectBefore) {
-    indexRequiredBefore = phaseObjects.findIndex(entry => entry.id === requiredObjectBefore.id);
+    indexRequiredBefore = phaseObjects.findIndex(entry => entry.id === requiredObjectBefore.id || entry.id === requiredObjectBefore.interventionID);
   }
 
   if (requiredObjectAfter) {
-    indexRequiredAfter = phaseObjects.findIndex(entry => entry.id === requiredObjectAfter.id);
-  }
-
-  if (objectAfter) {
-    indexAfter = phaseObjects.findIndex(entry => entry.id === objectAfter.id);
+    indexRequiredAfter = phaseObjects.findIndex(entry => entry.id === requiredObjectAfter.id || entry.id === requiredObjectAfter.interventionID);
   } // There is a more compact way to do the below but this made
   // it easier for me to get the logic right
   // insert according to required before first as we want to follow something that was required
 
 
   if (indexRequiredBefore !== -1) {
-    insertionIndex = indexRequiredBefore + 2; // but if the just before object is greater then insert relative to it
+    insertionIndex = indexRequiredBefore + 1; // but if the just before object is greater then insert relative to it
 
-    if (indexBefore > indexRequiredBefore) {
-      insertionIndex = indexBefore + 2;
+    if (!!indexBefore && indexBefore > indexRequiredBefore) {
+      insertionIndex = indexBefore + 1;
     }
   } //if no required before and not required after then insert relative to
   //required item after in actions definition
 
 
   if (!insertionIndex && indexRequiredAfter !== -1) {
-    insertionIndex = indexRequiredAfter + 1; // unless the just after is smaller then override and insert relative to it
+    insertionIndex = indexRequiredAfter - 1;
+  }
 
-    if (indexAfter < indexRequiredAfter) {
-      insertionIndex = indexAfter + 1;
-    }
+  ; // unless the just after is smaller then override and insert relative to it
+
+  if (indexAfter < indexRequiredAfter) {
+    insertionIndex = indexAfter - 1;
   } //otherwide if have a just before insert relative to it
 
 
   if (!insertionIndex && indexBefore !== -1) {
-    insertionIndex = indexBefore + 2;
+    insertionIndex = indexBefore + 1;
   } //otherwise if have a just after insert relative to it
 
 
   if (!insertionIndex && indexAfter !== -1) {
-    insertionIndex = indexAfter + 1;
+    insertionIndex = indexAfter - 1;
   } //otherwise put at end of phase
 
 
   if (!insertionIndex) {
-    insertionIndex = phaseObjects.length + 2;
+    insertionIndex = phaseObjects.length + 1;
   }
 
   insertInPhaseInOrder(phaseNames, phases, object, insertionIndex);
@@ -1881,6 +1875,9 @@ function findBestSolMatch(prob, confirmedEvents) {
   }
 
   let fSol = solutions[finalIndex];
+  let altActsToRemove; //need to adjust actions in suggested order to eliminate alts not being used
+
+  fSol.ordering = [...fSol.actionsInSuggestedOrder];
 
   if (fSol.altActions.length !== 0) {
     //let variant  //commenting out until variant questions resolved 8/10/22
@@ -1899,7 +1896,18 @@ function findBestSolMatch(prob, confirmedEvents) {
     }
 
     if (!foundOneAltAction) {
-      fSol.notFound.push(fSol.altActions[0]);
+      let action = fSol.altActions[0];
+      altActsToRemove = fSol.altActions.filter(function (e) {
+        return e.id != action.id;
+      }).map(e => e.id);
+      fSol.notFound.push(action);
+    }
+
+    if (!!altActsToRemove) {
+      fSol.ordering = fSol.actionsInSuggestedOrder.filter(function (e) {
+        return !altActsToRemove.includes(e.interventionID);
+      });
+      console.log("ordering", fSol.ordering);
     }
   }
 
@@ -1921,6 +1929,7 @@ const insertMissingInterventions = (problems, confirmedEvents, indexCounter, pha
           variant = intvVariant2JSON(action.interventionVariant)}
       else {variant = "{}"} */
 
+      confirmedEvents.push(action.id);
       confirmedEvents.push(action.id + "+" + variant);
       let phaseObject = {
         "comment": "",
@@ -2002,7 +2011,8 @@ const insertMissingInterventions = (problems, confirmedEvents, indexCounter, pha
       phaseObject.status = "missing" + capitalizeFirstLetter(phaseObject.protocolRelationship); //assume actions are in the suggested order to solve a problem
 
       if (!["optional", "unnecessary", "irrelevant", "redundant"].includes(phaseObject.protocolRelationship)) {
-        insertInPhaseRelativeToSuggestedOrder(phaseNames, phases, phaseObject, actions, k);
+        let orderingIndex = sol.ordering.findIndex(x => x.interventionID === phaseObject.id);
+        insertInPhaseRelativeToSuggestedOrder(phaseNames, phases, phaseObject, sol.ordering, orderingIndex, confirmedEvents);
         indexCounter++;
       }
     });
