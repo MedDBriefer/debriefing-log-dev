@@ -10270,8 +10270,9 @@ const C5CA_PhaseIE = {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "STEP_DATA": () => (/* binding */ STEP_DATA)
+/* harmony export */   "SC8CP_PhaseDEBRF": () => (/* binding */ SC8CP_PhaseDEBRF)
 /* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4354);
 // type Phase_D = {
 //     step:  string;
 //     title: string;
@@ -10316,7 +10317,8 @@ __webpack_require__.r(__webpack_exports__);
 // };
 // type Step_Data = [Phase_D, Phase_E, Phase_B, Phase_R, Phase_F];
 // export const STEP_DATA: Step_Data = [
-const STEP_DATA = [{
+
+const SC8CP_PhaseDEBRF = [{
   step: "D",
   title: "Define Rules:",
   text: ["The purpose of this debriefing is to reflect on the scenario you have just completed in order to help you improve your skills as a paramedic.  It is not meant to assess your overall abilities as a paramedic.", "This debriefing will summarize the learning objectives of this scenario and the performance benchmarks (standards) for achieving each objective.  The system will then prompt you to examine differences between the treatment actions that you performed and those indicated by the clinical findings revealed during the scenario, or that would have been revealed by a more thorough assessment and reassessment of this patient.  Finally, it will prompt you to state some 'take home points' to improve your performance."]
@@ -10406,35 +10408,7 @@ const STEP_DATA = [{
 }, {
   step: "R",
   slides: [{
-    text: {
-      __html: "In an idealized scenario, you arrive on scene and find a 4-year-old boy lying supine beside a pool in the backyard of a suburban house. Other EMS responders have arrived on site to assist you.  Your initial assessment reveals that the boy is unconscious and cyanotic.  A quick pulse check shows that it is slow and weak. Given that the patient is in <a name=\"critical_condition\">critical condition</a>, you direct a responder to call for air transport to the <a name=\"nearest_pediatric\">nearest pediatric</a> trauma center.",
-      linkHoverText: {
-        "critical_condition": "This patient is unresponsive and is therefore considered a critical patient.",
-        "nearest_pediatric_trauma_center": "Because this patient is under 14 years of age, he should be transported to the nearest level 1 or 2 pediatric trauma center that is less than 45 minutes away."
-      }
-    }
-  }, {
-    text: {
-      __html: "You direct another partner to take <a name=\"manual_c-spine_precautions\">manual c-spine precautions</a> and apply a cervical collar. You open the patient’s airway, using a jaw thrust maneuver.  Finding a substantial amount of water and vomit in the boy’s mouth, you apply suction. After the patient’s airway is cleared, you assess breathing and find it to be slow with gurgling sounds. You direct your partner to insert an OPA and ventilate the patient with 100% oxygen delivered through a <a name=\"bag_valve_mask\">bag-valve mask.</a>",
-      linkHoverText: {
-        "manual_c-spine_precautions": "Any near-drowning or drowning, especially if unwitnessed, should be considered a risk for possible cervical and spinal injury as the patient may have been involved in a diving accident.",
-        "bag_valve_mask": "This patient was not adequately ventilating (slow, gurgling breaths) or oxygenating (low SpO2) so O2 delivered via nasal cannula or non-rebreather mask would not have been adequate."
-      }
-    }
-  }, {
-    text: {
-      __html: "You then <a name=\"intubate_the_patient\">intubate the patient</a> and direct your partner to resume BVM ventilation all while maintaining c-spine precautions. You have another responder obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from the babysitter while you perform a rapid head-to-toe assessment.  On completion of your secondary survey, you secure him onto a long back board.",
-      linkHoverText: {
-        "intubate_the_patient": "The patient was unresponsive with a GCS of 3 so should be intubated to safely get the patient to the pediatric trauma center (remember, generally with a GCS <8, you should intubate)."
-      }
-    }
-  }, {
-    text: {
-      __html: "You and your partners then place the patient on a stretcher and transfer him to the helicopter as soon as it arrives.  You cover him with blankets and ask the pilot to turn up the heat. While en route to the pediatric trauma center, you contact the facility to alert them to the patient’s condition and your ETA.  You establish two large bore IVs, reassess the patient <a name=\"every_five_minutes\">every five minutes</a>, and confirm that all interventions are working properly, modifying any as necessary.",
-      linkHoverText: {
-        "every_five_minutes": "Critically ill patients should be reassessed every 5 minutes."
-      }
-    }
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a 4-year-old boy lying supine beside a pool in the backyard of a suburban house. Other EMS responders have arrived on site to assist you.  Your initial assessment reveals that the boy is unconscious and cyanotic.  A quick pulse check shows that it is slow and weak. Given that the patient is in critical condition,"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("critical condition,", "This patient is unresponsive and is therefore considered a critical patient."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("you direct a responder to call for air transport to the nearest pediatric trauma center."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("nearest pediatric trauma center.", "Because this patient is under 14 years of age, he should be transported to the nearest level 1 or 2 pediatric trauma center that is less than 45 minutes away.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You direct another partner to take manual c-spine precautions"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("manual c-spine precautions", "Any near-drowning or drowning, especially if unwitnessed, should be considered a risk for possible cervical and spinal injury as the patient may have been involved in a diving accident."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and apply a cervical collar. You open the patient’s airway, using a jaw thrust maneuver.  Finding a substantial amount of water and vomit in the boy’s mouth, you apply suction. After the patient’s airway is cleared, you assess breathing and find it to be slow with gurgling sounds. You direct your partner to insert an OPA and ventilate the patient with 100% oxygen delivered through a bag-valve mask."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("bag-valve mask", "This patient was not adequately ventilating (slow, gurgling breaths) or oxygenating (low SpO2) so O2 delivered via nasal cannula or non-rebreather mask would not have been adequate.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You then intubate the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("intubate the patient", "The patient was unresponsive with a GCS of 3 so should be intubated to safely get the patient to the pediatric trauma center (remember, generally with a GCS <8, you should intubate)."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and direct your partner to resume BVM ventilation all while maintaining c-spine precautions. You have another responder obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from the babysitter while you perform a rapid head-to-toe assessment.  On completion of your secondary survey, you secure him onto a long back board.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You and your partners then place the patient on a stretcher and transfer him to the helicopter as soon as it arrives.  You cover him with blankets and ask the pilot to turn up the heat. While en route to the pediatric trauma center, you contact the facility to alert them to the patient’s condition and your ETA.  You establish two large bore IVs, reassess the patient every five minutes,"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "Critically ill patients should be reassessed every 5 minutes."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
   }]
 }, {
   step: "F",
@@ -12989,6 +12963,33 @@ function getScenarioFeedback(scenName) {
     default:
       return {};
   }
+}
+
+/***/ }),
+
+/***/ 4354:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "link": () => (/* binding */ link),
+/* harmony export */   "para": () => (/* binding */ para),
+/* harmony export */   "text": () => (/* binding */ text)
+/* harmony export */ });
+function text(textString) {
+  return {
+    text: textString,
+    hoverText: null
+  };
+}
+function link(linkText, hoverText) {
+  return {
+    text: linkText,
+    hoverText: hoverText
+  };
+}
+function para(...spans) {
+  return spans;
 }
 
 /***/ }),
