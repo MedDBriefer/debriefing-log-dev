@@ -860,22 +860,15 @@ const annotateInputEvents = (events, problems) => {
         let variant;
 
         if (!!event.intvVariant) {
-          variant = (0,_meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_0__.intvVariant2JSON)(event.intvVariant);
-        } else {
+          variant = event.intvVariant;
+        } //intvVariant2JSON(event.intvVariant)}
+        else {
           variant = "{}";
-        }
+        } //intvVariant2JSON({})}
+
 
         let prescribedAnswers = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.getPrescribedInvAnswers)(event.interventionID, variant);
-        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processAnswers)(event, eventObj, prescribedAnswers, "incorrect-answers");
-
-        if (!eventObj.answerCorrect) {
-          if (eventObj.incorrectAnswersFB) {
-            eventObj.incorrectAnswersFB = eventObj.incorrectAnswersFB + ", and " + correctAnswerLabel;
-          } else {
-            eventObj.incorrectAnswersFB = correctAnswerLabel;
-          }
-        } //anything with leftover status of intervention means it wasn't part of the solution
-
+        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processAnswers)(event, eventObj, prescribedAnswers, "incorrect-answers"); //anything with leftover status of intervention means it wasn't part of the solution
 
         if (eventObj.status === "intervention") {
           eventObj.status = "irrelevant";
@@ -1550,7 +1543,7 @@ function analyzeEvents(scen, log) {
   console.log("Constraint Violation Results", constraintsViolated); // verify that scenario specified vitals have been checked twice
 
   let vitalsCounts = (0,_vitalsChecking__WEBPACK_IMPORTED_MODULE_6__.doVitalsCounts)(finalActions, scen.name);
-  (0,_vitalsChecking__WEBPACK_IMPORTED_MODULE_6__.doVitalsFeedback)(finalActions, vitalsCounts);
+  (0,_vitalsChecking__WEBPACK_IMPORTED_MODULE_6__.doVitalsFeedback)(finalActions, vitalsCounts, scen.name);
   console.log("vitalsCounts: ", vitalsCounts); //remove analysis fields not needed by others before returning them
 
   let trimmedActions = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.trimActions)(finalActions, analysisFields);
@@ -1957,6 +1950,7 @@ const processFirstArg = (firstArgItem, phases, phaseNames, entryNames, entries, 
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "applyFBTemplate": () => (/* binding */ applyFBTemplate),
 /* harmony export */   "filterConstraintsBySolutions": () => (/* binding */ filterConstraintsBySolutions),
 /* harmony export */   "getAssessmentIcon": () => (/* binding */ getAssessmentIcon),
 /* harmony export */   "getColor": () => (/* binding */ getColor),
@@ -2117,7 +2111,7 @@ const getAssessmentIcon = (currentEntry, fbTemplates) => {
 const getColor = (currentEntry, fbTemplates) => {
   let color = _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_0__.colorTypes[getAssessmentEntry(currentEntry, 0, fbTemplates)];
   return color;
-}; //add protexted spaces after a . except for the very last .
+}; //add protected spaces after a . except for the very last .
 //Otherwise html reduces continguous regular spaces to a single space.
 //Need this for text strings that will appear in one array entry because
 //of substitution
@@ -2273,6 +2267,123 @@ const getPhaseFeedback = (entry, phaseFBGiven, c2FB) => {
   entry.phFeedback = result;
   return [result, phaseFBGiven];
 };
+const applyFBTemplate = (rep, c2FB, template) => {
+  let fb; //Find any @ actions in the template and substitute with the indicated entry field
+
+  let feedbackArray = template.split(" "); //Process all @ substitutions first since +eos does one forward action
+
+  feedbackArray.forEach((item, i) => {
+    let firstChar = item.charAt(0);
+    let newString = item.substring(1); //trim off excess blanks before and after each word
+
+    feedbackArray[i] = feedbackArray[i].trim();
+
+    switch (firstChar) {
+      case "@":
+        fb = getFBField(rep, newString, c2FB);
+
+        if (!!fb) {
+          feedbackArray[i] = fb;
+        } else {
+          feedbackArray[i] = "[missing: " + newString + "]";
+        }
+
+        break;
+
+      case "?":
+        fb = getFBField(rep, newString, c2FB);
+
+        if (!!fb) {
+          //replace eos spacing with protected spaces in the substitution string
+          feedbackArray[i] = fb;
+        } else {
+          feedbackArray[i] = "";
+
+          if (feedbackArray[i - 1] === "+bos") {
+            feedbackArray[i - 1] = "";
+
+            if (feedbackArray[i - 2][feedbackArray[i - 2].length - 1] !== ".") {
+              feedbackArray[i - 2] = feedbackArray[i - 2] + ".\xa0";
+            }
+          }
+
+          if (feedbackArray[i + 1] === "+eos") {
+            feedbackArray[i + 1] = "";
+          }
+        }
+
+        break;
+
+      default:
+    }
+  }); //Now address the + actions in the template
+
+  feedbackArray.forEach((item, i) => {
+    let firstChar = item.charAt(0);
+    let previousString = "";
+
+    switch (firstChar) {
+      case "+":
+        let afterPlusChar = item.substring(1);
+
+        switch (afterPlusChar) {
+          case "eos":
+            //removes existing/redundant "." if present so can be certain putting in single "."
+            previousString = feedbackArray[i - 1].trim();
+
+            if (previousString[previousString.length - 1] === ".") {
+              previousString = previousString.slice(0, -1);
+            } //now add end of sentence and a protected space.  When stiched back into
+            //a single string a protected space will be added between each substring
+
+
+            feedbackArray[i - 1] = previousString + ".\xa0";
+            feedbackArray[i] = ""; //get rid of the command since was applied
+
+            break;
+
+          case "bos":
+            //removes existing/redundant "." if present so can put in single "."
+            previousString = feedbackArray[i - 1].trim();
+
+            if (previousString[previousString.length - 1] === ".") {
+              previousString = previousString.slice(0, -1);
+            } //now add end of sentence .
+
+
+            feedbackArray[i - 1] = previousString + ".\xa0";
+            feedbackArray[i] = ""; //get rid of the command since was applied
+            //Captitalize the beginning of the sentence
+
+            let nextString = feedbackArray[i + 1].trim();
+            feedbackArray[i + 1] = nextString.charAt(0).toUpperCase() + nextString.slice(1);
+            break;
+
+          default:
+        }
+
+        break;
+
+      default:
+    }
+  }); //stitch back into a single string
+
+  let feedbackString = "";
+
+  for (let item of feedbackArray) {
+    if (!!feedbackString) {
+      if (item !== "") {
+        feedbackString = feedbackString + "\xa0" + item;
+      }
+    } else {
+      if (item !== "") {
+        feedbackString = item;
+      }
+    }
+  }
+
+  return feedbackString;
+};
 const getFeedback = (currentEntry, c2FB, fbTemplates) => {
   let vitalsCheckFB = "";
 
@@ -2287,122 +2398,9 @@ const getFeedback = (currentEntry, c2FB, fbTemplates) => {
     }
 
     let feedbackTemplate = fixStrSp(getAssessmentEntry(currentEntry, 1, fbTemplates)).trim();
-    let fb; //Find any @ actions in the template and substitute with the indicated entry field
+    let feedbackString = applyFBTemplate(currentEntry, c2FB, feedbackTemplate); //console.log(feedbackString)
 
-    let feedbackArray = feedbackTemplate.split(" "); //Process all @ substitutions first since +eos does one forward action
-
-    feedbackArray.forEach((item, i) => {
-      let firstChar = item.charAt(0);
-      let newString = item.substring(1); //trim off excess blanks before and after each word
-
-      feedbackArray[i] = feedbackArray[i].trim();
-
-      switch (firstChar) {
-        case "@":
-          fb = getFBField(currentEntry, newString, c2FB);
-
-          if (!!fb) {
-            feedbackArray[i] = fb;
-          } else {
-            feedbackArray[i] = "[missing: " + newString + "]";
-          }
-
-          break;
-
-        case "?":
-          fb = getFBField(currentEntry, newString, c2FB);
-
-          if (!!fb) {
-            //replace eos spacing with protected spaces in the substitution string
-            feedbackArray[i] = fb;
-          } else {
-            feedbackArray[i] = "";
-
-            if (feedbackArray[i - 1] === "+bos") {
-              feedbackArray[i - 1] = "";
-
-              if (feedbackArray[i - 2][feedbackArray[i - 2].length - 1] !== ".") {
-                feedbackArray[i - 2] = feedbackArray[i - 2] + ".\xa0";
-              }
-            }
-
-            if (feedbackArray[i + 1] === "+eos") {
-              feedbackArray[i + 1] = "";
-            }
-          }
-
-          break;
-
-        default:
-      }
-    }); //Now address the + actions in the template
-
-    feedbackArray.forEach((item, i) => {
-      let firstChar = item.charAt(0);
-      let previousString = "";
-
-      switch (firstChar) {
-        case "+":
-          let afterPlusChar = item.substring(1);
-
-          switch (afterPlusChar) {
-            case "eos":
-              //removes existing/redundant "." if present so can be certain putting in single "."
-              previousString = feedbackArray[i - 1].trim();
-
-              if (previousString[previousString.length - 1] === ".") {
-                previousString = previousString.slice(0, -1);
-              } //now add end of sentence and a protected space.  When stiched back into
-              //a single string a protected space will be added between each substring
-
-
-              feedbackArray[i - 1] = previousString + ".\xa0";
-              feedbackArray[i] = ""; //get rid of the command since was applied
-
-              break;
-
-            case "bos":
-              //removes existing/redundant "." if present so can put in single "."
-              previousString = feedbackArray[i - 1].trim();
-
-              if (previousString[previousString.length - 1] === ".") {
-                previousString = previousString.slice(0, -1);
-              } //now add end of sentence .
-
-
-              feedbackArray[i - 1] = previousString + ".\xa0";
-              feedbackArray[i] = ""; //get rid of the command since was applied
-              //Captitalize the beginning of the sentence
-
-              let nextString = feedbackArray[i + 1].trim();
-              feedbackArray[i + 1] = nextString.charAt(0).toUpperCase() + nextString.slice(1);
-              break;
-
-            default:
-          }
-
-          break;
-
-        default:
-      }
-    }); //stitch back into a single string
-
-    let feedbackString = "";
-
-    for (let item of feedbackArray) {
-      if (!!feedbackString) {
-        if (item !== "") {
-          feedbackString = feedbackString + "\xa0" + item;
-        }
-      } else {
-        if (item !== "") {
-          feedbackString = item;
-        }
-      }
-    } //console.log(feedbackString)
-
-
-    if (!!vitalsCheckFB) {
+    if (vitalsCheckFB !== "") {
       feedbackString = vitalsCheckFB + feedbackString;
     }
 
@@ -2785,6 +2783,8 @@ function checkForMinimalCases(actions, formattedActions, problems) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "analyzeEvents": () => (/* reexport safe */ _analyzeEvents__WEBPACK_IMPORTED_MODULE_1__.analyzeEvents),
+/* harmony export */   "applyFBTemplate": () => (/* reexport safe */ _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.applyFBTemplate),
+/* harmony export */   "doVitalsCounts": () => (/* reexport safe */ _vitalsChecking__WEBPACK_IMPORTED_MODULE_2__.doVitalsCounts),
 /* harmony export */   "getAssessmentIcon": () => (/* reexport safe */ _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.getAssessmentIcon),
 /* harmony export */   "getColor": () => (/* reexport safe */ _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.getColor),
 /* harmony export */   "getFeedback": () => (/* reexport safe */ _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.getFeedback),
@@ -2793,11 +2793,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "saveAnalysisLog": () => (/* reexport safe */ _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.saveAnalysisLog),
 /* harmony export */   "saveCommentLog": () => (/* reexport safe */ _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.saveCommentLog),
 /* harmony export */   "saveLog": () => (/* reexport safe */ _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.saveLog),
-/* harmony export */   "summarizeAnalysis": () => (/* reexport safe */ _summarizeAnalysis__WEBPACK_IMPORTED_MODULE_2__.summarizeAnalysis)
+/* harmony export */   "summarizeAnalysis": () => (/* reexport safe */ _summarizeAnalysis__WEBPACK_IMPORTED_MODULE_3__.summarizeAnalysis)
 /* harmony export */ });
 /* harmony import */ var _debriefingUtils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5064);
 /* harmony import */ var _analyzeEvents__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4654);
-/* harmony import */ var _summarizeAnalysis__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5937);
+/* harmony import */ var _vitalsChecking__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5700);
+/* harmony import */ var _summarizeAnalysis__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5937);
+
 
 
  // setC2FB, ,  c2FB , setRequiredPhaseNames
@@ -3276,8 +3278,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _debriefingUtils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5064);
 
 
-function doVitalsFeedback(actions, vitalsCount) {
-  let FBitems; // only one of vitalsCheckFeedbackID and vitalsCheckFeedbackLabel
+function doVitalsFeedback(actions, vitalsCount, scen) {
+  let FBitems;
+  let entry = { ..._meddbriefer_feedback_data_analysisData__WEBPACK_IMPORTED_MODULE_0__.globalReassessmentKn[scen]
+  };
+  let fbTemplates = _meddbriefer_feedback_data_analysisData__WEBPACK_IMPORTED_MODULE_0__.globalReassessmentFeedback; // only one of vitalsCheckFeedbackID and vitalsCheckFeedbackLabel
   // should be defined.  But will default to using label if both are.
   // Need to use label to find where to insert for phase level FB and
   // id for inserting FB at leaf level
@@ -3288,46 +3293,77 @@ function doVitalsFeedback(actions, vitalsCount) {
 
   if (!!_meddbriefer_feedback_data_analysisData__WEBPACK_IMPORTED_MODULE_0__.vitalsCheckFeedbackLabel) {
     FBitems = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.getEvents)(actions, "label", _meddbriefer_feedback_data_analysisData__WEBPACK_IMPORTED_MODULE_0__.vitalsCheckFeedbackLabel);
-  }
+  } //multiple entries for the above label or id may be found but just need one.  
+  //Assuming the first found is fine for inserting the fb for condition 1
+
 
   let FBitem = FBitems[0];
-  let FBgoodText = "Given the interventions needed, you appropriately checked the following vital(s) at least twice: ";
-  let FBsomeMissingText = "However, you also should have checked the following vital(s) at least twice: ";
-  let FBallMissingText = "Given the interventions needed, you should have checked the following vital(s) at least twice: ";
-  let finalFB = "";
-  let done = [];
-  let notDone = [];
+  let finalFB;
+  let done;
+  let notDone;
+  let template; //collect which required vitals were checked twice and which
+  //were not according to the vitalsCount
 
   for (const [vital, count] of Object.entries(vitalsCount)) {
     if (count < 2) {
-      notDone.push(vital);
+      if (!!notDone) {
+        notDone = notDone + ", " + vital;
+      } else {
+        notDone = vital;
+      }
     } else {
-      done.push(vital);
+      if (!!done) {
+        done = done + ", " + vital;
+      } else {
+        done = vital;
+      }
     }
+  } //save the list of what was and wasn't done two or more times
+
+
+  entry.notDone = notDone;
+  entry.done = done; //select the apppropriate feedback template
+
+  if (!done && !!notDone) {
+    template = fbTemplates["absent"];
   }
 
-  if (done.length === 0 && notDone.length !== 0) {
-    finalFB = FBallMissingText + notDone + ".";
+  if (!!done && !notDone) {
+    template = fbTemplates["good"];
   }
 
-  if (done.length !== 0 && notDone.length === 0) {
-    finalFB = FBgoodText + done + ".";
-  }
+  if (!!done && !!notDone) {
+    template = fbTemplates["errors"];
+  } //Fill in the template using the field values in object entry.
+  //For now am not passing in c2FB because we haven't defined
+  //where the global vitals check feedback should be located (i.e.
+  //a separate id or the id where appears in condition 1 but with
+  //a different field specified?  I would think the former but
+  //need to confirm with Patty/Scott)
 
-  if (done.length !== 0 && notDone.length !== 0) {
-    finalFB = FBgoodText + done + ". " + FBsomeMissingText + notDone + ".";
-  }
 
-  if (done.length !== 0 || notDone.length !== 0) {
+  finalFB = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.applyFBTemplate)(entry, {}, template); //save the vitals found/not found in the action/event object where
+  //the fb string is stored.  Probably don't need it saved since the
+  //fb string has already been generated
+
+  if (!!done) {
     FBitem.vitalsDoneTwice = done;
+  }
+
+  if (!!notDone) {
     FBitem.vitalsNotDoneTwice = notDone;
+  } //save the feedback string in the action/event object if one was 
+  //generated
+
+
+  if (!!finalFB) {
     FBitem.vitalsFB = finalFB;
   }
 }
 function doVitalsCounts(actions, scen) {
   let vitalsCount = [];
   let numVitalFound;
-  let vitalsToCheck = _meddbriefer_feedback_data_analysisData__WEBPACK_IMPORTED_MODULE_0__.vitalChecks[scen];
+  let vitalsToCheck = _meddbriefer_feedback_data_analysisData__WEBPACK_IMPORTED_MODULE_0__.globalReassessmentKn[scen]["vitalLabels"];
   let actionIDs = actions.map(e => e.id);
   let numFound;
   let minFound;
@@ -3338,7 +3374,9 @@ function doVitalsCounts(actions, scen) {
       vitalsCount[vital] = 0;
 
       for (let entry of idEntries) {
-        minFound = 999; //going through the and entries where all must be present in same numbers
+        minFound = 999; //going through the "and" entries or assessment ids and assuming all must be present in 
+        //same numbers to count as a complete request for the vital (e.g. asks for each "sub"
+        //measure separately for some assessments)
 
         for (let id of entry) {
           if (actionIDs.includes(id)) {
@@ -12237,9 +12275,13 @@ const SC8CP_PhaseIE = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "conditionalConstraints": () => (/* binding */ conditionalConstraints),
+/* harmony export */   "criticalInterventions": () => (/* binding */ criticalInterventions),
 /* harmony export */   "exceptionDefs": () => (/* binding */ exceptionDefs),
 /* harmony export */   "globalConstraints": () => (/* binding */ globalConstraints),
+/* harmony export */   "globalReassessmentFeedback": () => (/* binding */ globalReassessmentFeedback),
+/* harmony export */   "globalReassessmentKn": () => (/* binding */ globalReassessmentKn),
 /* harmony export */   "intvChecks": () => (/* binding */ intvChecks),
+/* harmony export */   "intvStatusRules": () => (/* binding */ intvStatusRules),
 /* harmony export */   "scenarioConstraintIDs": () => (/* binding */ scenarioConstraintIDs),
 /* harmony export */   "vitalChecks": () => (/* binding */ vitalChecks),
 /* harmony export */   "vitalsCheckFeedbackID": () => (/* binding */ vitalsCheckFeedbackID),
@@ -12710,19 +12752,19 @@ const intvChecks = {
     vitalsNeeded: []
   },
   "intv-sedation-assisted-intubation": {
-    intvStatusNeeded: false,
+    intvStatusNeeded: true,
     vitalsNeeded: []
   } //"": {intvStatusNeeded: true, vitalsNeeded: []},  
   //"": {intvStatusNeeded: true, vitalsNeeded: []},
 
-}; // this is the name of the assessment step or phase that will provide the timestamp for the counting of vitals during the scenario
-// use one or the other but not both
+}; // this is the name of the assessment step or phase that will use for inserting global vitals check feedback
+// use one or the other constants below but not both
 // Use this one for inserting in a phase header
 
-const vitalsCheckFeedbackLabel = "Ongoing Management & Reassessment"; // Use this one for inserting in a step
-//export const vitalsCheckFeedbackID = "reassess-vital-signs"
+const vitalsCheckFeedbackLabel = undefined; //= "Ongoing Management & Reassessment"
+// Use this one for inserting in a step
 
-var vitalsCheckFeedbackID;
+const vitalsCheckFeedbackID = "reassess-vital-signs";
 const vitalChecks = {
   "B4CA": ["P", "R", "SpO2"],
   "B5CA": ["BP", "P", "R", "SpO2"],
@@ -12732,6 +12774,63 @@ const vitalChecks = {
   "M1CA": ["BP", "P", "R", "SpO2", "ETCO2"],
   "M2CA": ["BP", "P", "R", "SpO2", "ETCO2"],
   "B7CA": ["BP", "P", "R", "SpO2"]
+}; //the two below expand the above and could eliminate the above
+//need to write the software to handle these two structures instead of the above
+
+const globalReassessmentKn = {
+  "B4CA": {
+    vitalLabels: ["P", "R", "SpO2"],
+    requiredVitals: "P, R, and SpO2",
+    systems: "breathing",
+    criticalInterventions: "high flow O2 via nasal cannula or NRM"
+  },
+  "B5CA": {
+    vitalLabels: ["BP", "P", "R", "SpO2"],
+    requiredVitals: "BP, P, R, and SpO2",
+    systems: "breathing",
+    criticalInterventions: "high flow O2 with NRM or assisted BVM ventilation, needle decompression and an occlusive dressing"
+  },
+  "C5CA": {
+    vitalLabels: ["BP", "P", "R", "SpO2"],
+    requiredVitals: "BP, P, R, and SpO2",
+    systems: "circulation and breathing, ",
+    criticalInterventions: "direct pressure and a tourniquet, a basic adjunct, BVM ventilations with high-flow O2, and IV fluids en route to maintain SBP >= 90"
+  },
+  "SC8CP": {
+    vitalLabels: ["BP", "P", "R", "SpO2", "ETCO2"],
+    requiredVitals: "BP, P, R, SpO2 and ETCO2",
+    systems: "airway and breathing",
+    criticalInterventions: "an airway maneuver, suctioning, intubation, and BVM ventilation with high concentration O2"
+  },
+  "B1CA": {
+    vitalLabels: ["BP", "P", "R", "SpO2"],
+    requiredVitals: "BP, P, R, and SpO2",
+    systems: "breathing",
+    criticalInterventions: "NPA, BVM ventilation with high flow O2, tension pneumothorax, and needle decompression"
+  },
+  "M1CA": {
+    vitalLabels: ["BP", "P", "R", "SpO2", "ETCO2"],
+    requiredVitals: "BP, P, R, SpO2 and ETCO2",
+    systems: "airway and circulation",
+    criticalInterventions: "occlusive dressing on neck wound, basic airway maneuver, an NPA, sedated intubation and BVM ventilation with high flow O2"
+  },
+  "M2CA": {
+    vitalLabels: ["BP", "P", "R", "SpO2", "ETCO2"],
+    requiredVitals: "BP, P, R, SpO2 and ETCO2",
+    systems: "airway, breathing and circulation",
+    criticalInterventions: "direct pressure, a tourniquet, basic airway maneuver, Sedated intubation, an NPA, BVM ventilation with high flow O2, a large bore IV and IV fluids en route to maintain SBP >= 90"
+  },
+  "B7CA": {
+    vitalLabels: ["BP", "P", "R", "SpO2"],
+    requiredVitals: "BP, P, R, and SpO2",
+    systems: "breathingd",
+    criticalInterventions: "supplemental O2 via NRM, pleural decompression and an occlusive dressing to the entrance wound "
+  }
+};
+const globalReassessmentFeedback = {
+  good: "This patient had several abnormal baseline vitals—most notably @requiredVitals +bos  The patient needed @criticalInterventions +bos You correctly checked for improvement in these vitals to ensure that the patient's @systems was adequately managed +eos",
+  errors: "This patient had several abnormal baseline vitals—most notably @requiredVitals +bos  The patient needed @criticalInterventions +bos You should have checked for improvement in all of these vitals to ensure that the patient's @systems was adequately managed +bos You missed checking @notDone +eos",
+  absent: "This patient had several abnormal baseline vitals—most notably @requiredVitals +bos  The patient needed @criticalInterventions +bos You should have checked for improvement in these vitals to ensure that the patient's @systems was adequately managed +eos"
 }; //at top level [] read as an or
 //at next level [] read as an and
 // not yet in use
@@ -12747,7 +12846,58 @@ const vitalsTakenDueToAssessmentSteps = {
   "ETCO2": [["required-action-obtains-vitals"], ["request-vitals-ETCO2"]],
   "SpO2": [["required-action-obtains-vitals"], ["request-vitals-Spo2"]],
   "Temp": [["required-action-obtains-vitals"], ["request-vitals-Temp"]]
-};
+}; //per scenario sets of interventions that satisfy completion of critical actions for that scenario
+
+const criticalInterventions = {
+  B4CA: [["intv-supplemental-oxygen-device-nasal-cannula"], ["intv-supplemental-oxygen-device-non-rebreather-mask"]],
+  B5CA: [["intv-supplemental-oxygen-device-non-rebreather-mask", "intv-occlusive-dressing", "intv-pleural-decompression"], ["intv-ventilation-technique-bag-valve-mask", "intv-occlusive-dressing", "intv-pleural-decompression"]],
+  C5CA: [["intv-control-severe-bleeding-technique-direct-pressure", "intv-control-severe-bleeding-technique-tourniquet", "intv-nasopharyngeal-airway", "intv-ventilation-technique-bag-valve-mask", "intv-control-shock-technique-administer-iv-boluses"]],
+  SC8CP: [["intv-open-airway-method-modified-jaw-thrust", "intv-airway-patency-technique-suction-airway", "intv-oropharyngeal-airway", "intv-orotracheal-intubation", "intv-ventilation-technique-bag-valve-mask"], ["intv-open-airway-method-modified-jaw-thrust", "intv-airway-patency-technique-suction-airway", "intv-nasopharyngeal-airway", "intv-orotracheal-intubation", "intv-ventilation-technique-bag-valve-mask"]],
+  B1CA: [["intv-nasopharyngeal-airway", "intv-ventilation-technique-bag-valve-mask", "intv-pleural-decompression"]],
+  M1CA: [["intv-occlusive-dressing", "intv-open-airway-method-modified-jaw-thrust", "intv-nasopharyngeal-airway", "intv-sedation-assisted-intubation", "intv-ventilation-technique-bag-valve-mask"]],
+  M2CA: [["intv-control-severe-bleeding-technique-direct-pressure", "intv-control-severe-bleeding-technique-tourniquet", "intv-open-airway-method-modified-jaw-thrust", "intv-sedation-assisted-intubation", "intv-nasopharyngeal-airway", "intv-ventilation-technique-bag-valve-mask", "intv-control-shock-technique-administer-iv-boluses"]],
+  B7CA: [["intv-supplemental-oxygen-device-non-rebreather-mask", "intv-pleural-decompression", "intv-occlusive-dressing"]]
+}; //could create a set of default good values but sounds like will
+//want to customize the descriptive text per scenario (and may not
+//always want the completely good value as an effect)
+
+const intvStatusRules = {
+  B4CA: [],
+  B5CA: [],
+  C5CA: [],
+  SC8CP: {
+    "intv-open-airway-method-modified-jaw-thrust": [["airway-has-intact-physical-structures", "patent"]],
+    "intv-airway-patency-technique-suction-airway": [["airway-is-open", "open"], ["inspects-mouth-fluids", "clear"]],
+    "intv-oropharyngeal-airway": [[]],
+    "intv-orotracheal-intubation": [["breathing-checks-rate", "WNL"], ["breathing-checks-quality", "WNL"]],
+    "intv-ventilation-technique-bag-valve-mask": [[]],
+    "intv-nasopharyngeal-airway": [[]]
+  },
+  B1CA: [],
+  M1CA: [],
+  M2CA: [],
+  B7CA: []
+}; //all below is just for my editing purposes in the above structures
+//commented out ones that don't impact assessment findings
+
+const interventions = ["intv-open-airway-method-head-tilt", "intv-open-airway-method-modified-jaw-thrust", "intv-airway-patency-technique-suction-airway", "intv-manual-finger-sweep", "intv-magill-forceps-assisted", "intv-heimlich-maneuver", "intv-back-blows-and-chest-thrusts", "intv-oropharyngeal-airway", "intv-nasopharyngeal-airway", "intv-orotracheal-intubation", "intv-nasotracheal-intubation", //"intv-rapid-sequence-intubation",
+"intv-sedation-assisted-intubation", "intv-needle-cricothyrotomy", "intv-surgical-cricothyrotomy", "intv-supplemental-oxygen-device-nasal-cannula", "intv-supplemental-oxygen-device-non-rebreather-mask", "intv-ventilation-technique-bag-valve-mask", "intv-control-severe-bleeding-technique-direct-pressure", "intv-control-severe-bleeding-technique-tourniquet", "intv-control-severe-bleeding-technique-2nd-tourniquet", "intv-control-severe-bleeding-technique-pack-wound-with-gauze", "intv-control-severe-bleeding-technique-pressure-bandage", //"intv-control-severe-bleeding-technique-load-and-go",
+"intv-control-shock-technique-keep-patient-warm", "intv-control-shock-technique-place-patient-supine-position", "intv-control-shock-technique-administer-iv-boluses", "intv-occlusive-dressing", "intv-pleural-decompression", //"intv-spinal-immobilization-technique-manual-c-spine",
+//"intv-spinal-immobilization-technique-cervical-collar",
+//"intv-spinal-immobilization-technique-attach-cid",
+//"intv-transport",
+//"intv-apply-sterile-dressings",
+"intv-prepare-and-administer-pain-nausea-vomiting-medications", //"intv-contact-receiving-facility",
+//"intv-sling",
+"intv-insert-advanced-airway" //"intv-call-for-air-ambulance",
+//"intv-contact-medical-command",
+//"intv-establish-iv",
+//"intv-prepare-amputated-part",
+//"intv-splint-fracture",
+//"intv-place-on-immobilization-device",
+//"intv-walk-patient-to-ambulance",
+//"intv-place-directly-on-stretcher",
+];
 
 /***/ }),
 
@@ -14560,14 +14710,14 @@ function isEmpty(obj) {
 
 function processAnswers(eventIn, eventOut, prescribedAnswers, errorStatusVal) {
   if (!!eventIn.answers && prescribedAnswers && !isEmpty(eventIn.answers)) {
-    eventOut.answerCorrect = undefined;
     let answerDetails;
     let correctAnswerLabel;
     let givenAnswerLabel;
     eventOut.answerCorrect = true; // move through the given answers and compare to the prescribed answers
 
-    for (const [promptID, answerID] of Object.entries(eventIn.answers)) {
-      let correctAnswerID = prescribedAnswers[promptID];
+    for (const [promptID, answerEntry] of Object.entries(eventIn.answers)) {
+      let answerID = answerEntry[0];
+      let correctAnswerID = prescribedAnswers[promptID][0];
       correctAnswerLabel = getAnswerLabel(correctAnswerID);
       givenAnswerLabel = getAnswerLabel(answerID);
 
