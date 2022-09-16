@@ -859,16 +859,19 @@ const annotateInputEvents = (events, problems) => {
 
         let variant;
 
-        if (!!event.intvVariant) {
-          variant = event.intvVariant;
-        } //intvVariant2JSON(event.intvVariant)}
-        else {
+        if (!!event.intvVariant && typeof event.intvVariant === 'string' && event.intvVariant !== "{}") {
+          let origVariant = JSON.parse(event.intvVariant); //intvVariant2JSON(event.intvVariant)}
+
+          let key = Object.keys(origVariant)[0];
+          let val = origVariant[key][0];
+          variant = "{\"" + key + "\":\"" + val + "\"}";
+        } else {
           variant = "{}";
-        } //intvVariant2JSON({})}
+        } //intvVariant2JSON({})} 
 
 
         let prescribedAnswers = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.getPrescribedInvAnswers)(event.interventionID, variant);
-        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processAnswers)(event, eventObj, prescribedAnswers, "incorrect-answers"); //anything with leftover status of intervention means it wasn't part of the solution
+        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processInterventionAnswers)(event, eventObj, prescribedAnswers, "incorrect-answers"); //anything with leftover status of intervention means it wasn't part of the solution
 
         if (eventObj.status === "intervention") {
           eventObj.status = "irrelevant";
@@ -877,7 +880,13 @@ const annotateInputEvents = (events, problems) => {
 
       if (eventObj.type === "decision-option") {
         let prescribedAnswers = scenario.checkListCorrectness;
-        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processAnswers)(event, eventObj, prescribedAnswers, "decision-option-incorrect");
+        let parentItem = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.getItem)(event.parentID, itemByID, itemByLabel);
+
+        if (parentItem) {
+          event.parentLabel = parentItem.label;
+        }
+
+        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processAssessmentAnswers)(event, eventObj, prescribedAnswers, "decision-option-incorrect");
 
         if (!eventObj.answerCorrect) {
           eventObj.incorrectAnswersFB = "You should have responded " + eventObj.incorrectAnswersFB;
@@ -886,7 +895,13 @@ const annotateInputEvents = (events, problems) => {
 
       if (eventObj.type === "assessment-option") {
         let prescribedAnswers = scenario.checkListCorrectness;
-        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processAnswers)(event, eventObj, prescribedAnswers, "assessment-option-incorrect");
+        let parentItem = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.getItem)(event.parentID, itemByID, itemByLabel);
+
+        if (parentItem) {
+          event.parentLabel = parentItem.label;
+        }
+
+        eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_8__.processAssessmentAnswers)(event, eventObj, prescribedAnswers, "assessment-option-incorrect");
 
         if (!eventObj.answerCorrect) {
           eventObj.incorrectAnswersFB = "You should have responded " + eventObj.incorrectAnswersFB;
@@ -3739,7 +3754,7 @@ function DisplayContent({
 
   function regularLabel(entry) {
     return entry.subPhase && entry.type !== "intervention" ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
-      children: [entry.actionDescription, ".  ", findingsData(entry)]
+      children: [entry.actionDescription, ".  ", answerData(entry), findingsData(entry)]
     }, void 0, true) : phaseLabel(entry);
   }
 
@@ -14651,7 +14666,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "getAnswerLabel": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.getAnswerLabel),
 /* harmony export */   "getPrescribedInvAnswers": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.getPrescribedInvAnswers),
 /* harmony export */   "initializePromptAnswerGrading": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.initializePromptAnswerGrading),
-/* harmony export */   "processAnswers": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.processAnswers)
+/* harmony export */   "processAssessmentAnswers": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.processAssessmentAnswers),
+/* harmony export */   "processInterventionAnswers": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.processInterventionAnswers)
 /* harmony export */ });
 /* harmony import */ var _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1095);
 
@@ -14667,7 +14683,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "getAnswerLabel": () => (/* binding */ getAnswerLabel),
 /* harmony export */   "getPrescribedInvAnswers": () => (/* binding */ getPrescribedInvAnswers),
 /* harmony export */   "initializePromptAnswerGrading": () => (/* binding */ initializePromptAnswerGrading),
-/* harmony export */   "processAnswers": () => (/* binding */ processAnswers)
+/* harmony export */   "processAssessmentAnswers": () => (/* binding */ processAssessmentAnswers),
+/* harmony export */   "processInterventionAnswers": () => (/* binding */ processInterventionAnswers)
 /* harmony export */ });
 /* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5735);
 /* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__);
@@ -14690,6 +14707,15 @@ function getAnswerIDs(scen) {
       answerIDs[answer.id] = answer.label;
     });
   }
+
+  if (scen._checkListMetaData) {
+    let entries = scen._checkListMetaData;
+    entries.forEach(entry => {
+      if (entry.type === "decision-option") {
+        answerIDs[entry.id] = entry.label;
+      }
+    });
+  }
 }
 
 function getPrescribedInvAnswers(interventionID, variantDef) {
@@ -14708,7 +14734,51 @@ function isEmpty(obj) {
 //being annotated during analysis
 
 
-function processAnswers(eventIn, eventOut, prescribedAnswers, errorStatusVal) {
+function processAssessmentAnswers(eventIn, eventOut, prescribedAnswers, errorStatusVal) {
+  if (prescribedAnswers) {
+    let answerDetails;
+    let correctAnswerLabel;
+    let givenAnswerLabel;
+    eventOut.answerCorrect = true;
+    let promptID = eventIn.parentID;
+    let answerID = eventIn.id;
+    let correctAnswerID = prescribedAnswers[promptID];
+    correctAnswerLabel = getAnswerLabel(correctAnswerID);
+    givenAnswerLabel = getAnswerLabel(answerID);
+
+    if (correctAnswerLabel && givenAnswerLabel) {
+      //returns false if answered correctly
+      let wrongAnswer = evalForIncorrectAnswer(answerID, prescribedAnswers[promptID]); //store details of this answer and its grading
+
+      answerDetails = {
+        "correctAnswer": correctAnswerLabel,
+        "givenAnswer": givenAnswerLabel,
+        "correct": !wrongAnswer
+      }; //storing the prompt/answer details
+
+      eventOut.answerDetails[promptID] = answerDetails; //eventOut.actionDescription = eventOut.actionDescription + ", " + givenAnswerLabel;
+
+      if (wrongAnswer) {
+        eventOut.answerCorrect = false;
+        eventOut.status = errorStatusVal;
+
+        if (eventOut.incorrectAnswersFB) {
+          eventOut.incorrectAnswersFB = eventOut.incorrectAnswersFB + ", and " + correctAnswerLabel;
+        } else {
+          eventOut.incorrectAnswersFB = correctAnswerLabel;
+        }
+      }
+    }
+  }
+
+  eventOut.id = eventIn.parentID;
+  eventOut.label = eventIn.parentLabel;
+  eventOut.actionDescription = eventOut.label;
+  return eventOut;
+} //eventIn is the observer log event and eventOut is the event
+//being annotated during analysis
+
+function processInterventionAnswers(eventIn, eventOut, prescribedAnswers, errorStatusVal) {
   if (!!eventIn.answers && prescribedAnswers && !isEmpty(eventIn.answers)) {
     let answerDetails;
     let correctAnswerLabel;
@@ -14721,9 +14791,7 @@ function processAnswers(eventIn, eventOut, prescribedAnswers, errorStatusVal) {
       correctAnswerLabel = getAnswerLabel(correctAnswerID);
       givenAnswerLabel = getAnswerLabel(answerID);
 
-      if (!correctAnswerLabel || !givenAnswerLabel) {
-        eventOut.processingState = "bad";
-      } else {
+      if (correctAnswerLabel && givenAnswerLabel) {
         //returns false if answered correctly
         let wrongAnswer = evalForIncorrectAnswer(answerID, prescribedAnswers[promptID]); //store details of this answer and its grading
 
