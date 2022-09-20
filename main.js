@@ -577,8 +577,8 @@ const annotateInputEvents = (events, problems) => {
   let phaseObjects = [];
   let trackForStatus = {}; //save correct interventions that were done that require status checks later
   //let altFound = undefined   //can have only one set of alternative interventions per problem
-  // phases entry of that name and then use that index to retrieve the appropriate phase entried to
-  //add on the missing items (assessment or intervention) for that phase
+  // will create a phases entry of that name in phaseNames and then use that index to retrieve the appropriate phase entry
+  //in structure phases to add on the missing items (assessment or intervention) for that phase
 
   let priorPhase = "";
   let parentPhase = "";
@@ -1118,6 +1118,11 @@ const checkForMissingAssessments = (problems, events, confirmedEvents, phaseName
 
       if (phaseObject.type === "required-action") {
         phaseObject.status = "missingRequiredAssessment";
+      } //assign special status for items marked as "not-graded"
+
+
+      if (!!cls.graded && !cls.graded) {
+        phaseObject.status = "not-graded";
       }
 
       (0,_actionInsertion__WEBPACK_IMPORTED_MODULE_3__.insertInPhaseRelativeToSuggestedOrder)(phaseNames, phases, phaseObject, checklistSteps, i, confirmedEvents, checklistHierarchy, requiredPhaseNames, requiredSubphases, phaseRequiredAtEnd); //insertInPhaseInOrder(phaseNames, phases, phaseObject, i);
@@ -3499,27 +3504,47 @@ function DisplayContent({
     }
 
     return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("p", {
-      children: answers.map((entry, index) => /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("b", {
-          children: [entry.ID, ":"]
-        }, void 0, true, {
-          fileName: _jsxFileName,
-          lineNumber: 48,
-          columnNumber: 21
-        }, this), " ", entry.answer, /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("br", {}, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 49,
-          columnNumber: 21
-        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("br", {}, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 50,
-          columnNumber: 21
-        }, this)]
-      }, index, true, {
-        fileName: _jsxFileName,
-        lineNumber: 47,
-        columnNumber: 17
-      }, this))
+      children: answers.map((entry, index) => {
+        if (entry.ID) {
+          return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
+            children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("b", {
+              children: [entry.ID, ":"]
+            }, void 0, true, {
+              fileName: _jsxFileName,
+              lineNumber: 49,
+              columnNumber: 25
+            }, this), " ", entry.answer, /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("br", {}, void 0, false, {
+              fileName: _jsxFileName,
+              lineNumber: 50,
+              columnNumber: 25
+            }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("br", {}, void 0, false, {
+              fileName: _jsxFileName,
+              lineNumber: 51,
+              columnNumber: 25
+            }, this)]
+          }, index, true, {
+            fileName: _jsxFileName,
+            lineNumber: 48,
+            columnNumber: 28
+          }, this);
+        } else {
+          return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
+            children: [entry.answer, /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("br", {}, void 0, false, {
+              fileName: _jsxFileName,
+              lineNumber: 56,
+              columnNumber: 25
+            }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("br", {}, void 0, false, {
+              fileName: _jsxFileName,
+              lineNumber: 57,
+              columnNumber: 25
+            }, this)]
+          }, index, true, {
+            fileName: _jsxFileName,
+            lineNumber: 54,
+            columnNumber: 28
+          }, this);
+        }
+      })
     }, void 0, false, {
       fileName: _jsxFileName,
       lineNumber: 45,
@@ -3549,18 +3574,18 @@ function DisplayContent({
             children: entry.label
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 70,
+            lineNumber: 78,
             columnNumber: 25
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 69,
+          lineNumber: 77,
           columnNumber: 21
         }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("td", {
           children: phaseFB
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 72,
+          lineNumber: 80,
           columnNumber: 21
         }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("td", {
           children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("textarea", {
@@ -3571,12 +3596,12 @@ function DisplayContent({
             id: `${entry.id}`
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 75,
+            lineNumber: 83,
             columnNumber: 25
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 74,
+          lineNumber: 82,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -3586,14 +3611,22 @@ function DisplayContent({
         className: "black"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 88,
+        lineNumber: 96,
         columnNumber: 17
       }, this);
     }
   };
+  /*  function getLabel(entry) {
+       return entry.type === "obtain-vital-sign" 
+           ? vitalLabel(entry)
+           : regularLabel(entry)
+   } */
+
 
   function getLabel(entry) {
-    return entry.type === "obtain-vital-sign" ? vitalLabel(entry) : regularLabel(entry);
+    return entry.type === "obtain-vital-sign" ? vitalLabel(entry) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
+      children: [entry.actionDescription, ".  ", answerData(entry), findingsData(entry)]
+    }, void 0, true);
   }
 
   function getStatusLabel(entry) {
@@ -3609,7 +3642,7 @@ function DisplayContent({
           children: "Requested vital:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 113,
+          lineNumber: 127,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
           className: "text-muted",
@@ -3618,23 +3651,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 114,
+              lineNumber: 128,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 114,
+              lineNumber: 128,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 114,
+            lineNumber: 128,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 114,
+          lineNumber: 128,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -3646,7 +3679,7 @@ function DisplayContent({
           children: "Requested intervention status for:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 121,
+          lineNumber: 135,
           columnNumber: 21
         }, this), " ", getStatusLabel(entry), ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
           className: "text-muted",
@@ -3655,23 +3688,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 122,
+              lineNumber: 136,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 122,
+              lineNumber: 136,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 122,
+            lineNumber: 136,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 122,
+          lineNumber: 136,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -3683,7 +3716,7 @@ function DisplayContent({
           children: "Requested SAMPLE:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 129,
+          lineNumber: 143,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
           className: "text-muted",
@@ -3692,23 +3725,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 130,
+              lineNumber: 144,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 130,
+              lineNumber: 144,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 130,
+            lineNumber: 144,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 130,
+          lineNumber: 144,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -3720,7 +3753,7 @@ function DisplayContent({
           children: "Requested OPQRST:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 137,
+          lineNumber: 151,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
           className: "text-muted",
@@ -3729,42 +3762,39 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 138,
+              lineNumber: 152,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 138,
+              lineNumber: 152,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 138,
+            lineNumber: 152,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 138,
+          lineNumber: 152,
           columnNumber: 21
         }, this)]
       }, void 0, true);
     }
   }
-
-  function regularLabel(entry) {
-    return entry.subPhase && entry.type !== "intervention" ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
-      children: [entry.actionDescription, ".  ", answerData(entry), findingsData(entry)]
-    }, void 0, true) : phaseLabel(entry);
+  /* function regularLabel(entry) {
+      return  (entry.subPhase && entry.type !== "intervention") || entry.type === "decision-option"
+          ? <>{entry.actionDescription}.  {answerData(entry)}{findingsData(entry)}</>
+          : phaseLabel(entry)
   }
+    function phaseLabel(entry){
+      return entry.type === "intervention"
+          ? <>{entry.actionDescription}. {answerData(entry)} </>
+          : <>{entry.actionDescription}.  {findingsData(entry)}</>
+  } */
 
-  function phaseLabel(entry) {
-    return entry.type === "intervention" ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
-      children: [entry.actionDescription, ". ", answerData(entry), " "]
-    }, void 0, true) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
-      children: [entry.actionDescription, ".  ", findingsData(entry)]
-    }, void 0, true);
-  }
 
   function findingsData(entry) {
     return entry.finding ? /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
@@ -3774,27 +3804,27 @@ function DisplayContent({
           children: "Findings:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 160,
+          lineNumber: 174,
           columnNumber: 47
         }, this), " ", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("i", {
           children: entry.finding
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 160,
+          lineNumber: 174,
           columnNumber: 64
         }, this)]
       }, void 0, true, {
         fileName: _jsxFileName,
-        lineNumber: 160,
+        lineNumber: 174,
         columnNumber: 44
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 160,
+      lineNumber: 174,
       columnNumber: 15
     }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {}, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 161,
+      lineNumber: 175,
       columnNumber: 15
     }, this);
   }
@@ -3805,11 +3835,11 @@ function DisplayContent({
       children: formatAnswerGiven(entry)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 166,
+      lineNumber: 180,
       columnNumber: 14
     }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {}, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 167,
+      lineNumber: 181,
       columnNumber: 14
     }, this);
   }
@@ -3839,13 +3869,13 @@ function DisplayContent({
         children: entry.numericalID
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 196,
+        lineNumber: 210,
         columnNumber: 17
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("td", {
         children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getTimestamp)(entry)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 197,
+        lineNumber: 211,
         columnNumber: 17
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("td", {
         className: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getColor)(entry, fbTemplates),
@@ -3854,18 +3884,18 @@ function DisplayContent({
           children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getAssessmentIcon)(entry, fbTemplates)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 199,
+          lineNumber: 213,
           columnNumber: 21
         }, this), getLabel(entry)]
       }, void 0, true, {
         fileName: _jsxFileName,
-        lineNumber: 198,
+        lineNumber: 212,
         columnNumber: 17
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("td", {
         children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_5__.getFeedback)(entry, c2FB, fbTemplates)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 202,
+        lineNumber: 216,
         columnNumber: 17
       }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("td", {
         children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("textarea", {
@@ -3876,12 +3906,12 @@ function DisplayContent({
           id: `${entry.id}`
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 206,
+          lineNumber: 220,
           columnNumber: 25
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 205,
+        lineNumber: 219,
         columnNumber: 21
       }, this)]
     }, void 0, true);
@@ -3920,7 +3950,7 @@ function DisplayContent({
       children: "processing"
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 252,
+      lineNumber: 266,
       columnNumber: 17
     }, this);
   }
@@ -3934,7 +3964,7 @@ function DisplayContent({
         children: "Save"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 261,
+        lineNumber: 275,
         columnNumber: 29
       }, this) // leftNav2={
       //     <Button
@@ -3951,18 +3981,18 @@ function DisplayContent({
         children: "Toggle Comments"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 277,
+        lineNumber: 291,
         columnNumber: 29
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 258,
+      lineNumber: 272,
       columnNumber: 19
     }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)(_MDBNavBar__WEBPACK_IMPORTED_MODULE_6__["default"], {
       title: `Analysis for: ${analysisLog.label}`
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 285,
+      lineNumber: 299,
       columnNumber: 19
     }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("form", {
       children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("div", {
@@ -3980,45 +4010,45 @@ function DisplayContent({
                 children: " ID "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 294,
+                lineNumber: 308,
                 columnNumber: 29
               }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Timestamp "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 295,
+                lineNumber: 309,
                 columnNumber: 29
               }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Action Description "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 296,
+                lineNumber: 310,
                 columnNumber: 29
               }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Feedback "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 297,
+                lineNumber: 311,
                 columnNumber: 29
               }, this), showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Comments "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 298,
+                lineNumber: 312,
                 columnNumber: 51
               }, this)]
             }, void 0, true, {
               fileName: _jsxFileName,
-              lineNumber: 293,
+              lineNumber: 307,
               columnNumber: 25
             }, this)
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 292,
+            lineNumber: 306,
             columnNumber: 21
           }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("tbody", {
             className: "scroll",
@@ -4026,27 +4056,27 @@ function DisplayContent({
               children: currentEntry.type === "header" ? dispHeaderRow(currentEntry, index) : dispDataRow(currentEntry, index)
             }, index, false, {
               fileName: _jsxFileName,
-              lineNumber: 303,
+              lineNumber: 317,
               columnNumber: 29
             }, this))
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 301,
+            lineNumber: 315,
             columnNumber: 21
           }, this)]
         }, void 0, true, {
           fileName: _jsxFileName,
-          lineNumber: 291,
+          lineNumber: 305,
           columnNumber: 17
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 290,
+        lineNumber: 304,
         columnNumber: 13
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 289,
+      lineNumber: 303,
       columnNumber: 13
     }, this)]
   }, void 0, true);
@@ -12851,16 +12881,26 @@ const globalReassessmentFeedback = {
 // not yet in use
 
 const vitalsTakenDueToAssessmentSteps = {
-  "GCS": [["assess-loc"], ["required-action-obtains-vitals"], ["request-vitals-GCS"]],
-  "Pain": [["assess-loc"], ["required-action-obtains-vitals"], ["request-vitals-Pain"]],
-  "R": [["breathing-checks-rate", "breathing-checks-rhythm", "breathing-checks-quality"], ["required-action-obtains-vitals"], ["request-vitals-R"]],
-  "P": [["checked-carotid-pulse", "checks-pulse-rate", "checks-pulse-rhythm", "checks-pulse-quality"], ["checked-radial-pulse", "checks-pulse-rate", "checks-pulse-rhythm", "checks-pulse-quality"], ["required-action-obtains-vitals"], ["request-vitals-P"]],
-  "Skin": [["checks-skin-color", "checks-skin-temperature", "checks-skin-condition"], ["required-action-obtains-vitals"], ["request-vitals-Skin"]],
-  "BP": [["required-action-obtains-vitals"], ["request-vitals-BP"]],
-  "Glucose": [["required-action-obtains-vitals"], ["request-vitals-Glucose"]],
-  "ETCO2": [["required-action-obtains-vitals"], ["request-vitals-ETCO2"]],
-  "SpO2": [["required-action-obtains-vitals"], ["request-vitals-Spo2"]],
-  "Temp": [["required-action-obtains-vitals"], ["request-vitals-Temp"]]
+  "GCS": [//["assess-loc"], ["required-action-obtains-vitals"],
+  ["request-vitals-GCS"]],
+  "Pain": [//["assess-loc"], ["required-action-obtains-vitals"], 
+  ["request-vitals-Pain"]],
+  "R": [//["breathing-checks-rate", "breathing-checks-rhythm", "breathing-checks-quality"], ["required-action-obtains-vitals"], 
+  ["request-vitals-R"]],
+  "P": [//["checked-carotid-pulse", "checks-pulse-rate", "checks-pulse-rhythm", "checks-pulse-quality"], ["checked-radial-pulse", "checks-pulse-rate", "checks-pulse-rhythm", "checks-pulse-quality"],["required-action-obtains-vitals"], 
+  ["request-vitals-P"]],
+  "Skin": [//["checks-skin-color", "checks-skin-temperature", "checks-skin-condition"], ["required-action-obtains-vitals"], 
+  ["request-vitals-Skin"]],
+  "BP": [//["required-action-obtains-vitals"], 
+  ["request-vitals-BP"]],
+  "Glucose": [//["required-action-obtains-vitals"], 
+  ["request-vitals-Glucose"]],
+  "ETCO2": [//["required-action-obtains-vitals"], 
+  ["request-vitals-ETCO2"]],
+  "SpO2": [//["required-action-obtains-vitals"], 
+  ["request-vitals-Spo2"]],
+  "Temp": [//["required-action-obtains-vitals"], 
+  ["request-vitals-Temp"]]
 }; //per scenario sets of interventions that satisfy completion of critical actions for that scenario
 
 const criticalInterventions = {
@@ -12972,6 +13012,7 @@ const fbTemplatesDef = {
   "misOrdered-redundant": ["Problem", "Redundant intervention +bos You already did an alternative to this: @redundantToFB +eos"],
   //don't give additional feedback on redudant intervention
   "misOrdered-goodIntv": ["Problem", "Mistimed intervention +bos @orderingFB"],
+  "not-graded": ["Caution", "Not reported +bos You would have been told that the finding for @label was @finding +eos"],
   //once software re-written to optimaize all design changes, this section should be condensed to just
   //"misOrdered-phase": ["Problem", "Section not completed before starting another +bos @orderingFB +eos"]
   //since we are no longer placing the phase feedback in the first item of a phase
@@ -13041,7 +13082,7 @@ const phaseStatusList = {
   errors: ["redundant", "misOrdered-redundant", "redundant-incorrect-answers", "misOrdered-redundant-incorrect-answers", "misOrdered-assessment", "misOrdered-assessment-option", "misOrdered-decision-option", "misOrdered-required-action", "misOrdered-goodIntv", "assessment-option-incorrect", "decision-option-incorrect", "incorrect-answers", "minimal-incorrect-answers", //"minimal", 
   "misOrdered-assessment-option-incorrect", "misOrdered-decision-option-incorrect", "misOrdered-incorrect-answers", "misOrdered-minimal-incorrect-answers", "misOrdered-minimal", "irrelevant", "unnecessary", "contraindicated", "errors", "misOrdered-irrelevant", "misOrdered-alternative", "misOrdered-unnecessary", "midOrdered-contraindicated", "error", "misordered", "misordered-error", "misOrdered-phase-assessment-option-incorrect", "misOrdered-phase-decision-option-incorrect", "misOrdered-phase-incorrect-answers", "misOrdered-phase-minimal-incorrect-answers"],
   good: ["good", "assessment", "assessment-option", "decision-option", "required-action", "goodIntv", "optional", //condition 2 does not address these so put them in the good category
-  "patientIntvCheck", "patientVitalCheck", "notNecessary", "notFound", "intvCheckWNoIntvFound", "unexpectedPatientIntvCheck", "default", //condition 2 does not need to address minimal as an error nor misordered-phase as that error appears as misordered at the phase or subphase level
+  "patientIntvCheck", "patientVitalCheck", "notNecessary", "notFound", "intvCheckWNoIntvFound", "unexpectedPatientIntvCheck", "default", "not-graded", //condition 2 does not need to address minimal as an error nor misordered-phase as that error appears as misordered at the phase or subphase level
   //condition 1 uses misOrdered-Phase as that error feedback goes on the first line in the phase/subphase
   //so without misOrdered-phase and/or minimal, these are good status values
   "minimal", "misOrdered-phase-minimal", "misOrdered-phase-assessment", "misOrdered-phase-assessment-option", "misOrdered-phase-decision-option", "misOrdered-phase-required-action", "misOrdered-phase-goodIntv"]
@@ -13052,7 +13093,7 @@ const leafStatusList = {
   misorderedError: ["misOrdered-assessment-option-incorrect", "misOrdered-decision-option-incorrect", "misOrdered-incorrect-answers", "misOrdered-minimal-incorrect-answers", "misOrdered-phase-assessment-option-incorrect", "misOrdered-phase-decision-option-incorrect", "misOrdered-phase-incorrect-answers", "misOrdered-phase-minimal-incorrect-answers"],
   error: ["assessment-option-incorrect", "decision-option-incorrect", "incorrect-answers", "minimal-incorrect-answers", "contraindicated", "irrelevant", "unnecessary", "redundant", "redundant-incorrect-answers", "misOrdered-redundant", "misOrdered-redundant-incorrect-answers"],
   good: ["assessment", "assessment-option", "decision-option", "required-action", "goodIntv", "optional", //condition 2 does not address these so put them in the good category
-  "patientIntvCheck", "patientVitalCheck", "notNecessary", "intvCheckWNoIntvFound", "unexpectedPatientIntvCheck", "default", //condition 2 does not need to address minimal as an error nor misordered-phase as that error appears as misordered at the phase or subphase level
+  "patientIntvCheck", "patientVitalCheck", "notNecessary", "not-graded", "intvCheckWNoIntvFound", "unexpectedPatientIntvCheck", "default", //condition 2 does not need to address minimal as an error nor misordered-phase as that error appears as misordered at the phase or subphase level
   //condition 1 uses misOrdered-Phase as that error feedback goes on the first line in the phase/subphase
   //so without misOrdered-phase and/or minimal, these are good status values
   "minimal", "misOrdered-phase-minimal", "misOrdered-phase-assessment", "misOrdered-phase-assessment-option", "misOrdered-phase-decision-option", "misOrdered-phase-required-action", "misOrdered-phase-goodIntv"]
@@ -14786,8 +14827,8 @@ function processInterventionAnswers(eventIn, eventOut, prescribedAnswers, errorS
     eventOut.answerCorrect = true; // move through the given answers and compare to the prescribed answers
 
     for (const [promptID, answerEntry] of Object.entries(eventIn.answers)) {
-      let answerID = answerEntry[0];
-      let correctAnswerID = prescribedAnswers[promptID][0];
+      let answerID = answerEntry;
+      let correctAnswerID = prescribedAnswers[promptID];
       correctAnswerLabel = getAnswerLabel(correctAnswerID);
       givenAnswerLabel = getAnswerLabel(answerID);
 
@@ -15296,6 +15337,21 @@ const getScenarioByName = (db, scenarioName, schemaVersion) => {
 
 const addMissingScenarioTypeFields = scenTypeData => {
   const msgs = [];
+
+  if (scenTypeData.checklist) {
+    // console.log(CHECKLIST_STEP_TYPES)
+    scenTypeData.checklist.forEach(clItem => {
+      if (!("graded" in clItem)) {
+        if (_constants_js__WEBPACK_IMPORTED_MODULE_2__.CHECKLIST_STEP_TYPES.includes(clItem.type)) {
+          clItem["graded"] = true;
+          msgs.push(`set 'graded' to true for ${clItem.id}`);
+        } else {
+          clItem["graded"] = false;
+          msgs.push(`set 'graded' to false for ${clItem.id}`);
+        }
+      }
+    });
+  }
 
   if (!scenTypeData.interventions) {
     msgs.push("loading intvs from file");
