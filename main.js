@@ -1076,13 +1076,16 @@ const checkForMissingAssessments = (problems, events, confirmedEvents, phaseName
         "assessmentFB": "",
         "timestamp": -1
       }; //copy over the step fields that exist (type dependent)
+      //does prompt does exist in checlistSteps???  9/20/22
 
-      const STEP_FIELDS = ["id", "label", "finding", "phase", "subPhase", "type", "prompt"];
+      const STEP_FIELDS = ["id", "label", "phase", "subPhase", "type", "prompt"];
       STEP_FIELDS.forEach(fldName => {
         if (!!cls[fldName]) {
           phaseObject[fldName] = cls[fldName];
         }
       });
+      let assessments = scenario.assessmentFindings;
+      phaseObject["finding"] = assessments[cls.id];
       let item;
 
       if (!!cls.subPhase) {
@@ -1121,7 +1124,7 @@ const checkForMissingAssessments = (problems, events, confirmedEvents, phaseName
       } //assign special status for items marked as "not-graded"
 
 
-      if (!!cls.graded && !cls.graded) {
+      if (!cls.graded) {
         phaseObject.status = "not-graded";
       }
 
@@ -12921,8 +12924,8 @@ const intvStatusRules = {
   B5CA: [],
   C5CA: [],
   SC8CP: {
-    "intv-open-airway-method-modified-jaw-thrust": [["airway-has-intact-physical-structures", "patent"]],
-    "intv-airway-patency-technique-suction-airway": [["airway-is-open", "open"], ["inspects-mouth-fluids", "clear"]],
+    "intv-open-airway-method-modified-jaw-thrust": [["airway-has-intact-physical-structures", "intact"]],
+    "intv-airway-patency-technique-suction-airway": [["airway-is-open", "open"], ["inspects-mouth", "clear"], ["inspects-mouth-fluids", "clear"]],
     "intv-oropharyngeal-airway": [[]],
     "intv-orotracheal-intubation": [["breathing-checks-rate", "WNL"], ["breathing-checks-quality", "WNL"]],
     "intv-ventilation-technique-bag-valve-mask": [[]],
