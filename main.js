@@ -14706,8 +14706,6 @@ const StaffRoute = _ref => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "evalForIncorrectAnswer": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.evalForIncorrectAnswer),
-/* harmony export */   "getAnswerLabel": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.getAnswerLabel),
 /* harmony export */   "getPrescribedInvAnswers": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.getPrescribedInvAnswers),
 /* harmony export */   "initializePromptAnswerGrading": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.initializePromptAnswerGrading),
 /* harmony export */   "processAssessmentAnswers": () => (/* reexport safe */ _prompt_answer_grading__WEBPACK_IMPORTED_MODULE_0__.processAssessmentAnswers),
@@ -14723,8 +14721,6 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "evalForIncorrectAnswer": () => (/* binding */ evalForIncorrectAnswer),
-/* harmony export */   "getAnswerLabel": () => (/* binding */ getAnswerLabel),
 /* harmony export */   "getPrescribedInvAnswers": () => (/* binding */ getPrescribedInvAnswers),
 /* harmony export */   "initializePromptAnswerGrading": () => (/* binding */ initializePromptAnswerGrading),
 /* harmony export */   "processAssessmentAnswers": () => (/* binding */ processAssessmentAnswers),
@@ -14734,11 +14730,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6886);
 /* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9529);
+/* harmony import */ var core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es_string_includes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1235);
+/* harmony import */ var core_js_modules_es_string_includes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_includes_js__WEBPACK_IMPORTED_MODULE_3__);
+
+
 
 
 let answerIDs = [];
 let scenario;
+let prompts;
 function initializePromptAnswerGrading(scen) {
+  prompts = scen._interventionPrompts;
   getAnswerIDs(scen);
   scenario = scen;
   return 'prompt-answer-grading-initialized';
@@ -14791,18 +14795,17 @@ function processAssessmentAnswers(eventIn, eventOut, prescribedAnswers, errorSta
     givenAnswerLabel = getAnswerLabel(answerID);
 
     if (correctAnswerLabel && givenAnswerLabel) {
-      //returns false if answered correctly
-      let wrongAnswer = evalForIncorrectAnswer(answerID, prescribedAnswers[promptID]); //store details of this answer and its grading
+      let answerCorrect = answerID === prescribedAnswers[promptID]; //store details of this answer and its grading
 
       answerDetails = {
         "correctAnswer": correctAnswerLabel,
         "givenAnswer": givenAnswerLabel,
-        "correct": !wrongAnswer
+        "correct": answerCorrect
       }; //storing the prompt/answer details
 
       eventOut.answerDetails[promptID] = answerDetails; //eventOut.actionDescription = eventOut.actionDescription + ", " + givenAnswerLabel;
 
-      if (wrongAnswer) {
+      if (!answerCorrect) {
         eventOut.answerCorrect = false;
         eventOut.status = errorStatusVal;
 
@@ -14830,24 +14833,26 @@ function processInterventionAnswers(eventIn, eventOut, prescribedAnswers, errorS
     eventOut.answerCorrect = true; // move through the given answers and compare to the prescribed answers
 
     for (const [promptID, answerEntry] of Object.entries(eventIn.answers)) {
-      let answerID = answerEntry;
-      let correctAnswerID = prescribedAnswers[promptID];
-      correctAnswerLabel = getAnswerLabel(correctAnswerID);
-      givenAnswerLabel = getAnswerLabel(answerID);
+      let answerType = getSelectionType(promptID);
+      let answerIDs = answerEntry; //let answerID = answerIDs[0]
+
+      let correctAnswerIDs = prescribedAnswers[promptID];
+      correctAnswerLabel = getAnswerLabels(correctAnswerIDs);
+      givenAnswerLabel = getAnswerLabels(answerIDs);
 
       if (correctAnswerLabel && givenAnswerLabel) {
-        //returns false if answered correctly
-        let wrongAnswer = evalForIncorrectAnswer(answerID, prescribedAnswers[promptID]); //store details of this answer and its grading
+        //need to extract answerType from somewhere
+        let answerCorrectness = evalAnswers(answerIDs, correctAnswerIDs, answerType); //store details of this answer and its grading
 
         answerDetails = {
           "correctAnswer": correctAnswerLabel,
           "givenAnswer": givenAnswerLabel,
-          "correct": !wrongAnswer
+          "correct": answerCorrectness
         }; //storing the prompt/answer details
 
         eventOut.answerDetails[promptID] = answerDetails; //eventOut.actionDescription = eventOut.actionDescription + ", " + givenAnswerLabel;
 
-        if (wrongAnswer) {
+        if (!answerCorrectness) {
           eventOut.answerCorrect = false;
           eventOut.status = errorStatusVal;
 
@@ -14863,18 +14868,52 @@ function processInterventionAnswers(eventIn, eventOut, prescribedAnswers, errorS
 
   return eventOut;
 }
-const evalForIncorrectAnswer = (answerID, prescribedAnswers) => {
-  if (Array.isArray(prescribedAnswers)) {
-    //assumes an and for everything in the array
-    //returns bool regarding whether answerID NOT in answers
-    return !prescribedAnswers.find(ansId => ansId === answerID);
-  } else {
-    return prescribedAnswers !== answerID;
+
+function difference(setA, setB) {
+  return Array.from(setA).filter(e => !setB.includes(e));
+}
+
+const evalAnswers = (answerIDs, prescribedAnswerIDs, answerType) => {
+  switch (answerType) {
+    case "one-or-more":
+    case "one":
+    case "one-or-more-logical-or":
+      return difference(answerIDs, prescribedAnswerIDs).length === 0;
+
+    case "one-or-more-logical-and":
+      return difference(prescribedAnswerIDs, answerIDs).length === 0;
+
+    default:
+      break;
   }
 };
+
+const getSelectionType = promptID => {
+  let prompt = prompts.find(e => e.id === promptID);
+  return prompt.selectionType;
+};
+
 const getAnswerLabel = answerID => {
   let answerLabel = answerIDs[answerID];
   return answerLabel || "";
+};
+
+const getAnswerLabels = answerIDs => {
+  let answerLabel = "";
+
+  for (let answerID of answerIDs) {
+    if (answerLabel === "") {
+      answerLabel = getAnswerLabel(answerID);
+    } else {
+      let nextLabel = getAnswerLabel(answerID);
+
+      if (nextLabel !== "") {
+        answerLabel = answerLabel + ", " + nextLabel;
+      }
+    }
+  }
+
+  return answerLabel;
 };
 
 /***/ }),
