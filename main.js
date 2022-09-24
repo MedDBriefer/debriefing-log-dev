@@ -3632,10 +3632,10 @@ function DisplayContent({
     }, void 0, true);
   }
 
-  function getStatusLabel(entry) {
-    let metaData = scenario.intvMetaData;
-    let metaEntry = metaData.find(me => entry.vital === me.id);
-    return metaEntry.label;
+  function getIntvLabel(entry) {
+    let interventions = scenario._interventions;
+    let intv = interventions.find(me => entry.vital === me.id);
+    return intv.label;
   }
 
   function vitalLabel(entry) {
@@ -3684,7 +3684,7 @@ function DisplayContent({
           fileName: _jsxFileName,
           lineNumber: 135,
           columnNumber: 21
-        }, this), " ", getStatusLabel(entry), ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
+        }, this), " ", getIntvLabel(entry), ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("span", {
           className: "text-muted",
           children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("p", {
             children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxDEV)("b", {
@@ -12322,14 +12322,30 @@ const SC8CP_PhaseIE = {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "airwayAdjunct": () => (/* binding */ airwayAdjunct),
+/* harmony export */   "airwayOpen": () => (/* binding */ airwayOpen),
+/* harmony export */   "airwayPatent": () => (/* binding */ airwayPatent),
+/* harmony export */   "airwayProcedure": () => (/* binding */ airwayProcedure),
+/* harmony export */   "airwaySecured": () => (/* binding */ airwaySecured),
+/* harmony export */   "bad": () => (/* binding */ bad),
+/* harmony export */   "breathSounds": () => (/* binding */ breathSounds),
+/* harmony export */   "circulationPressure": () => (/* binding */ circulationPressure),
+/* harmony export */   "circulationTourniquet": () => (/* binding */ circulationTourniquet),
 /* harmony export */   "conditionalConstraints": () => (/* binding */ conditionalConstraints),
 /* harmony export */   "criticalInterventions": () => (/* binding */ criticalInterventions),
 /* harmony export */   "exceptionDefs": () => (/* binding */ exceptionDefs),
 /* harmony export */   "globalConstraints": () => (/* binding */ globalConstraints),
 /* harmony export */   "globalReassessmentFeedback": () => (/* binding */ globalReassessmentFeedback),
 /* harmony export */   "globalReassessmentKn": () => (/* binding */ globalReassessmentKn),
+/* harmony export */   "good": () => (/* binding */ good),
+/* harmony export */   "interventionStates": () => (/* binding */ interventionStates),
+/* harmony export */   "intubation": () => (/* binding */ intubation),
 /* harmony export */   "intvChecks": () => (/* binding */ intvChecks),
+/* harmony export */   "intvResults": () => (/* binding */ intvResults),
 /* harmony export */   "intvStatusRules": () => (/* binding */ intvStatusRules),
+/* harmony export */   "medCommandApproval": () => (/* binding */ medCommandApproval),
+/* harmony export */   "medEffects": () => (/* binding */ medEffects),
+/* harmony export */   "neutral": () => (/* binding */ neutral),
 /* harmony export */   "scenarioConstraintIDs": () => (/* binding */ scenarioConstraintIDs),
 /* harmony export */   "vitalChecks": () => (/* binding */ vitalChecks),
 /* harmony export */   "vitalsCheckFeedbackID": () => (/* binding */ vitalsCheckFeedbackID),
@@ -12732,16 +12748,20 @@ const conditionalConstraints = {
     afterOp: "",
     type: "leafA"
   }
-}; // used to simulate conditional constraints, i.e. we hardcode which conditional constraint ids as
+}; //pre-post test problems: M2CA, B7CA, B1CA, M1CA  (need data filled out in order to grade but don't need at time of running experiments w/ students)
+//training problems: B4CA, B5CA, C5CA, SC8CP
+// used to simulate conditional constraints, i.e. we hardcode which conditional constraint ids as
 // defined under conditionalConstraints (above) are relevant to each scenario
 // although one could put global constraint ids under scenarios here, it would be redundant and may cause software
 // issues
 
 const scenarioConstraintIDs = {
+  //training
   "B4CA": [],
   "B5CA": [],
   "C5CA": [],
   "SC8CP": ["T12-c1"],
+  //test
   "B1CA": [],
   "M1CA": [],
   "M2CA": ["T12-c1"],
@@ -12752,27 +12772,68 @@ const scenarioConstraintIDs = {
 //is true or false.  If true it means should have requested status of this intervention.  If vitals key is
 //not empty then should have checked all of these vitals as well.  Will only check entries after an intervention
 //up until something other than an intervention check is done
-//updates wrt SC8CP-combined-goals-4-4
+//Not currently issueing intervention specific reminders for what vitals need to be checked
+//Instead doing it per scenario
 
 const intvChecks = {
-  "intv-supplemental-oxygen-device-nasal-cannula": {
-    intvStatusNeeded: false,
+  "intv-open-airway-method-head-tilt": {
+    intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-supplemental-oxygen-device-non-rebreather-mask": {
-    intvStatusNeeded: false,
+  "intv-open-airway-method-modified-jaw-thrust": {
+    intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-ventilation-technique-bag-valve-mask": {
-    intvStatusNeeded: false,
+  "intv-airway-patency-technique-suction-airway": {
+    intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-pleural-decompression": {
-    intvStatusNeeded: false,
+  "intv-manual-finger-sweep": {
+    intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-occlusive-dressing": {
-    intvStatusNeeded: false,
+  "intv-magill-forceps-assisted": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-heimlich-maneuver": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-back-blows-and-chest-thrusts": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-oropharyngeal-airway": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-nasopharyngeal-airway": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-orotracheal-intubation": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-nasotracheal-intubation": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-insert-advanced-airway": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-sedation-assisted-intubation": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-needle-cricothyrotomy": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-surgical-cricothyrotomy": {
+    intvStatusNeeded: true,
     vitalsNeeded: []
   },
   "intv-control-severe-bleeding-technique-direct-pressure": {
@@ -12783,26 +12844,48 @@ const intvChecks = {
     intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-nasopharyngeal-airway": {
+  "intv-control-severe-bleeding-technique-2nd-tourniquet": {
     intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-control-shock-technique-administer-iv-boluses": {
-    intvStatusNeeded: false,
-    vitalsNeeded: []
-  },
-  "intv-orotracheal-intubation": {
+  "intv-control-severe-bleeding-technique-pack-wound-with-gauze": {
     intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-oropharyngeal-airway": {
+  "intv-control-severe-bleeding-technique-pressure-bandage": {
     intvStatusNeeded: true,
     vitalsNeeded: []
   },
-  "intv-sedation-assisted-intubation": {
+  "intv-occlusive-dressing": {
     intvStatusNeeded: true,
     vitalsNeeded: []
-  } //"": {intvStatusNeeded: true, vitalsNeeded: []},  
+  },
+  "intv-pleural-decompression": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-prepare-and-administer-pain-nausea-vomiting-medications": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-insert-advanced-airway": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  },
+  "intv-contact-medical-command": {
+    intvStatusNeeded: true,
+    vitalsNeeded: []
+  } // in general don't need to list if intvStatusNeeded is false but left these in in case want to use the
+  // vitalsNeeded field for these later on to do the reminder intervention by intervention
+  //"intv-supplemental-oxygen-device-nasal-cannula": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"intv-supplemental-oxygen-device-non-rebreather-mask": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"intv-ventilation-technique-bag-valve-mask": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"intv-pleural-decompression": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"intv-occlusive-dressing": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"intv-supplemental-oxygen-device-nasal-cannula": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"intv-supplemental-oxygen-device-non-rebreather-mask": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"intv-ventilation-technique-bag-valve-mask": {intvStatusNeeded: false, vitalsNeeded: []},
+  //"": {intvStatusNeeded: true, vitalsNeeded: []},  
   //"": {intvStatusNeeded: true, vitalsNeeded: []},
 
 }; // this is the name of the assessment step or phase that will use for inserting global vitals check feedback
@@ -12814,10 +12897,12 @@ const vitalsCheckFeedbackLabel = undefined; //= "Ongoing Management & Reassessme
 
 const vitalsCheckFeedbackID = "reassess-vital-signs";
 const vitalChecks = {
+  //training
   "B4CA": ["P", "R", "SpO2"],
   "B5CA": ["BP", "P", "R", "SpO2"],
   "C5CA": ["BP", "P", "R", "SpO2"],
   "SC8CP": ["BP", "P", "R", "SpO2", "ETCO2"],
+  //test
   "B1CA": ["BP", "P", "R", "SpO2"],
   "M1CA": ["BP", "P", "R", "SpO2", "ETCO2"],
   "M2CA": ["BP", "P", "R", "SpO2", "ETCO2"],
@@ -12826,6 +12911,7 @@ const vitalChecks = {
 //need to write the software to handle these two structures instead of the above
 
 const globalReassessmentKn = {
+  //training
   "B4CA": {
     vitalLabels: ["P", "R", "SpO2"],
     requiredVitals: "P, R, and SpO2",
@@ -12850,6 +12936,7 @@ const globalReassessmentKn = {
     systems: "airway and breathing",
     criticalInterventions: "an airway maneuver, suctioning, intubation, and BVM ventilation with high concentration O2"
   },
+  //test
   "B1CA": {
     vitalLabels: ["BP", "P", "R", "SpO2"],
     requiredVitals: "BP, P, R, and SpO2",
@@ -12907,10 +12994,12 @@ const vitalsTakenDueToAssessmentSteps = {
 }; //per scenario sets of interventions that satisfy completion of critical actions for that scenario
 
 const criticalInterventions = {
+  //training scenarios
   B4CA: [["intv-supplemental-oxygen-device-nasal-cannula"], ["intv-supplemental-oxygen-device-non-rebreather-mask"]],
   B5CA: [["intv-supplemental-oxygen-device-non-rebreather-mask", "intv-occlusive-dressing", "intv-pleural-decompression"], ["intv-ventilation-technique-bag-valve-mask", "intv-occlusive-dressing", "intv-pleural-decompression"]],
   C5CA: [["intv-control-severe-bleeding-technique-direct-pressure", "intv-control-severe-bleeding-technique-tourniquet", "intv-nasopharyngeal-airway", "intv-ventilation-technique-bag-valve-mask", "intv-control-shock-technique-administer-iv-boluses"]],
   SC8CP: [["intv-open-airway-method-modified-jaw-thrust", "intv-airway-patency-technique-suction-airway", "intv-oropharyngeal-airway", "intv-orotracheal-intubation", "intv-ventilation-technique-bag-valve-mask"], ["intv-open-airway-method-modified-jaw-thrust", "intv-airway-patency-technique-suction-airway", "intv-nasopharyngeal-airway", "intv-orotracheal-intubation", "intv-ventilation-technique-bag-valve-mask"]],
+  //test scenarios
   B1CA: [["intv-nasopharyngeal-airway", "intv-ventilation-technique-bag-valve-mask", "intv-pleural-decompression"]],
   M1CA: [["intv-occlusive-dressing", "intv-open-airway-method-modified-jaw-thrust", "intv-nasopharyngeal-airway", "intv-sedation-assisted-intubation", "intv-ventilation-technique-bag-valve-mask"]],
   M2CA: [["intv-control-severe-bleeding-technique-direct-pressure", "intv-control-severe-bleeding-technique-tourniquet", "intv-open-airway-method-modified-jaw-thrust", "intv-sedation-assisted-intubation", "intv-nasopharyngeal-airway", "intv-ventilation-technique-bag-valve-mask", "intv-control-shock-technique-administer-iv-boluses"]],
@@ -12920,6 +13009,7 @@ const criticalInterventions = {
 //always want the completely good value as an effect)
 
 const intvStatusRules = {
+  //training scenarios
   B4CA: [],
   B5CA: [],
   C5CA: [],
@@ -12931,12 +13021,384 @@ const intvStatusRules = {
     "intv-ventilation-technique-bag-valve-mask": [[]],
     "intv-nasopharyngeal-airway": [[]]
   },
+  //test scenarios
   B1CA: [],
   M1CA: [],
   M2CA: [],
   B7CA: []
-}; //all below is just for my editing purposes in the above structures
-//commented out ones that don't impact assessment findings
+};
+const airwayOpen = "airwayOpen";
+const airwayPatent = "airwayPatent";
+const airwayAdjunct = "airwayAdjunct";
+const airwaySecured = "airwaySecured";
+const intubation = "intubation";
+const airwayProcedure = "airwayProcedure";
+const circulationPressure = "circulationPressure";
+const circulationTourniquet = "CirculationTourniquet";
+const breathSounds = "breathSounds";
+const medEffects = "medEffects";
+const medCommandApproval = "medCommandApproval";
+const good = "good";
+const neutral = "neutral";
+const bad = "bad";
+const interventionStates = Object.freeze({
+  airwayOpen: {
+    good: "open",
+    neutral: "no change",
+    bad: "not open"
+  },
+  airwayPatent: {
+    good: "patent",
+    neutral: "no change",
+    bad: "not patent"
+  },
+  airwayAdjunct: {
+    good: "accepted, secured",
+    bad: "rejected, not secured"
+  },
+  airwaySecured: {
+    good: "secured",
+    bad: "not secured"
+  },
+  intubation: {
+    good: "correctly placed, secured, tube visualized, breath sounds bilateral, gastric sounds absent, chest equal rise and fall, ETCO2 present",
+    bad: "incorrectly placed, not secured, tube not visualized, breath sounds absent, gastric sounds present, chest unequal rise and fall, ETCO2 absent"
+  },
+  airwayProcedure: {
+    good: "successful, secured, chest rise and fall present",
+    bad: "unsuccessful, secured, chest rise and fall absent"
+  },
+  circulationPressure: {
+    good: "controlled",
+    neutral: "no change",
+    bad: "not controlled"
+  },
+  circulationTourniquet: {
+    good: "controlled, pulse absent",
+    neutral: "no change in bleeding, pulse absent",
+    bad: "not controlled, pulse present"
+  },
+  breathSounds: {
+    good: "breath sounds bilateral",
+    neutral: "no change",
+    bad: "breath sounds absent"
+  },
+  medEffects: {
+    good: "effective, pain: decreased, nausea decreased, agitation decreased",
+    neutral: "no change",
+    bad: "ineffective, pain: no change, nausea: no change, agitation: no change"
+  },
+  medCommandApproval: {
+    good: "approved",
+    bad: "denied"
+  }
+}); //if an intervention has a specific text string defined for a scenario then use that, otherwise use the type values specified above, using good or bad value as indicated
+//if the values should be different from types available then define a new type or a new value type (e.g. good/bad) under the type
+// good if should be done to change patient state or would have no effect on patient state, 
+// bad if it definitely would not change a bad patient status, 
+// neutral if status could have changed by another correct intervention
+// or if it is not indicated by patient status (i.e. state is fine so doing this would not change the state)
+
+const intvResults = Object.freeze({
+  "intv-open-airway-method-head-tilt": {
+    type: airwayOpen,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: good,
+    B1CA: neutral,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-open-airway-method-modified-jaw-thrust": {
+    type: airwayOpen,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: good,
+    B1CA: neutral,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-airway-patency-technique-suction-airway": {
+    type: airwayPatent,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: good,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  "intv-manual-finger-sweep": {
+    type: airwayPatent,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: bad,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  "intv-magill-forceps-assisted": {
+    type: airwayPatent,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: bad,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  "intv-heimlich-maneuver": {
+    type: airwayPatent,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: bad,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  "intv-back-blows-and-chest-thrusts": {
+    type: airwayPatent,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: bad,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  "intv-oropharyngeal-airway": {
+    type: airwayAdjunct,
+    B4CA: good,
+    B5CA: good,
+    C5CA: bad,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-nasopharyngeal-airway": {
+    type: airwayAdjunct,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-orotracheal-intubation": {
+    type: intubation,
+    B4CA: good,
+    B5CA: good,
+    C5CA: bad,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-nasotracheal-intubation": {
+    type: intubation,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-insert-advanced-airway": {
+    type: intubation,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  //"intv-rapid-sequence-intubation",
+  "intv-sedation-assisted-intubation": {
+    type: intubation,
+    B4CA: good,
+    B5CA: good,
+    C5CA: bad,
+    SC8CP: neutral,
+    B1CA: neutral,
+    M1CA: good,
+    M2CA: good,
+    B7CA: neutral
+  },
+  "intv-needle-cricothyrotomy": {
+    type: airwayProcedure,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-surgical-cricothyrotomy": {
+    type: airwayProcedure,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  //"intv-supplemental-oxygen-device-nasal-cannula": {type:, B4CA: good, B5CA: good, C5CA: good, SC8CP: good, B1CA: good, M1CA: good, M2CA: good, B7CA: good},
+  //"intv-supplemental-oxygen-device-non-rebreather-mask": {type:, B4CA: good, B5CA: good, C5CA: good, SC8CP: good, B1CA: good, M1CA: good, M2CA: good, B7CA: good},
+  //"intv-ventilation-technique-bag-valve-mask": {type:, B4CA: good, B5CA: good, C5CA: good, SC8CP: good, B1CA: good, M1CA: good, M2CA: good, B7CA: good},
+  "intv-control-severe-bleeding-technique-direct-pressure": {
+    type: circulationPressure,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: bad,
+    SC8CP: neutral,
+    B1CA: neutral,
+    M1CA: good,
+    M2CA: bad,
+    B7CA: neutral
+  },
+  "intv-control-severe-bleeding-technique-tourniquet": {
+    type: circulationTourniquet,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: good,
+    SC8CP: neutral,
+    B1CA: neutral,
+    M1CA: good,
+    M2CA: good,
+    B7CA: neutral
+  },
+  "intv-control-severe-bleeding-technique-2nd-tourniquet": {
+    type: circulationTourniquet,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: neutral,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  "intv-control-severe-bleeding-technique-pack-wound-with-gauze": {
+    type: circulationPressure,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: neutral,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  "intv-control-severe-bleeding-technique-pressure-bandage": {
+    type: circulationPressure,
+    B4CA: neutral,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: neutral,
+    B1CA: neutral,
+    M1CA: good,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  //"intv-control-severe-bleeding-technique-load-and-go",
+  //"intv-control-shock-technique-keep-patient-warm": {type:, B4CA: good, B5CA: good, C5CA: good, SC8CP: good, B1CA: good, M1CA: good, M2CA: good, B7CA: good},
+  //"intv-control-shock-technique-place-patient-supine-position": {type:, B4CA: good, B5CA: good, C5CA: good, SC8CP: good, B1CA: good, M1CA: good, M2CA: good, B7CA: good},
+  //"intv-control-shock-technique-administer-iv-boluses": {type:, B4CA: good, B5CA: good, C5CA: good, SC8CP: good, B1CA: good, M1CA: good, M2CA: good, B7CA: good},
+  "intv-occlusive-dressing": {
+    type: breathSounds,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  "intv-pleural-decompression": {
+    type: breathSounds,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  //"intv-spinal-immobilization-technique-manual-c-spine",
+  //"intv-spinal-immobilization-technique-cervical-collar",
+  //"intv-spinal-immobilization-technique-attach-cid",
+  //"intv-transport",
+  //"intv-apply-sterile-dressings",
+  "intv-prepare-and-administer-pain-nausea-vomiting-medications": {
+    type: medEffects,
+    B4CA: good,
+    B5CA: neutral,
+    C5CA: neutral,
+    SC8CP: neutral,
+    B1CA: neutral,
+    M1CA: neutral,
+    M2CA: neutral,
+    B7CA: neutral
+  },
+  //"intv-contact-receiving-facility",
+  //"intv-sling",
+  "intv-insert-advanced-airway": {
+    type: intubation,
+    B4CA: good,
+    B5CA: good,
+    C5CA: good,
+    SC8CP: good,
+    B1CA: good,
+    M1CA: good,
+    M2CA: good,
+    B7CA: good
+  },
+  //"intv-call-for-air-ambulance",
+  "intv-contact-medical-command": {
+    type: medCommandApproval,
+    B4CA: bad,
+    B5CA: bad,
+    C5CA: bad,
+    SC8CP: bad,
+    B1CA: bad,
+    M1CA: good,
+    M2CA: good,
+    B7CA: bad
+  } //"intv-establish-iv",
+  //"intv-prepare-amputated-part",
+  //"intv-splint-fracture",
+  //"intv-place-on-immobilization-device",
+  //"intv-walk-patient-to-ambulance",
+  //"intv-place-directly-on-stretcher",
+
+}); //all below is just for my editing purposes in the above structures
+//commented out ones that I don't impact assessment findings
 
 const interventions = ["intv-open-airway-method-head-tilt", "intv-open-airway-method-modified-jaw-thrust", "intv-airway-patency-technique-suction-airway", "intv-manual-finger-sweep", "intv-magill-forceps-assisted", "intv-heimlich-maneuver", "intv-back-blows-and-chest-thrusts", "intv-oropharyngeal-airway", "intv-nasopharyngeal-airway", "intv-orotracheal-intubation", "intv-nasotracheal-intubation", //"intv-rapid-sequence-intubation",
 "intv-sedation-assisted-intubation", "intv-needle-cricothyrotomy", "intv-surgical-cricothyrotomy", "intv-supplemental-oxygen-device-nasal-cannula", "intv-supplemental-oxygen-device-non-rebreather-mask", "intv-ventilation-technique-bag-valve-mask", "intv-control-severe-bleeding-technique-direct-pressure", "intv-control-severe-bleeding-technique-tourniquet", "intv-control-severe-bleeding-technique-2nd-tourniquet", "intv-control-severe-bleeding-technique-pack-wound-with-gauze", "intv-control-severe-bleeding-technique-pressure-bandage", //"intv-control-severe-bleeding-technique-load-and-go",
