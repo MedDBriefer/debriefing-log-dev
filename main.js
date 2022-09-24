@@ -13007,6 +13007,12 @@ const criticalInterventions = {
 }; //could create a set of default good values but sounds like will
 //want to customize the descriptive text per scenario (and may not
 //always want the completely good value as an effect)
+//each scenario entry is a list of rules
+//each rule is an object with the ands field being any other interventions that must have also been done to
+//qualify doing the update in field updates.
+//the updates field is a list of pairs of assessment ids and the value to update in that assessments findings field
+//Note that each member of the ands field has its own set of rules in this table.  Only one of the rules will "fire"
+//but is repeated because we don't know the order in which the interventions may be done
 
 const intvStatusRules = {
   //training scenarios
@@ -13014,12 +13020,27 @@ const intvStatusRules = {
   B5CA: [],
   C5CA: [],
   SC8CP: {
-    "intv-open-airway-method-modified-jaw-thrust": [["airway-has-intact-physical-structures", "intact"]],
-    "intv-airway-patency-technique-suction-airway": [["airway-is-open", "open"], ["inspects-mouth", "clear"], ["inspects-mouth-fluids", "clear"]],
-    "intv-oropharyngeal-airway": [[]],
-    "intv-orotracheal-intubation": [["breathing-checks-rate", "WNL"], ["breathing-checks-quality", "WNL"]],
-    "intv-ventilation-technique-bag-valve-mask": [[]],
-    "intv-nasopharyngeal-airway": [[]]
+    "intv-airway-patency-technique-suction-airway": [//rule 1
+    {
+      ands: [],
+      updates: [["airway-is-open", "open"], ["inspects-mouth", "patent"], ["inspects-mouth-fluids", "patent"]]
+    }, //rule 2
+    {
+      ands: ["intv-ventilation-technique-bag-valve-mask", "intv-orotracheal-intubation"],
+      updates: [//update pairs
+      ["inspects-right-arm-pulse", "strong"], ["inspects-right-leg-pulse", "strong"], ["inspects-left-arm-pulse", "strong"], ["inspects-left-leg-pulse", "strong"]]
+    }],
+    //"intv-oropharyngeal-airway": [{ands: [], updates: [[]]}], 
+    "intv-orotracheal-intubation": [//rule 1
+    {
+      ands: ["intv-ventilation-technique-bag-valve-mask", "intv-airway-patency-technique-suction-airway"],
+      updates: [["inspects-right-arm-pulse", "strong"], ["inspects-right-leg-pulse", "strong"], ["inspects-left-arm-pulse", "strong"], ["inspects-left-leg-pulse", "strong"]]
+    }],
+    "intv-ventilation-technique-bag-valve-mask": [{
+      ands: ["intv-orotracheal-intubation", "intv-airway-patency-technique-suction-airway"],
+      updates: [["inspects-right-arm-pulse", "strong"], ["inspects-right-leg-pulse", "strong"], ["inspects-left-arm-pulse", "strong"], ["inspects-left-leg-pulse", "strong"]]
+    }] //"intv-nasopharyngeal-airway": [{ands: [], updates: [[]]}],
+
   },
   //test scenarios
   B1CA: [],
