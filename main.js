@@ -4938,22 +4938,28 @@ function ObserverLogDetails({
             lineNumber: 21,
             columnNumber: 13
           }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: log.label
+            children: scenario.version
           }, void 0, false, {
             fileName: _jsxFileName,
             lineNumber: 22,
             columnNumber: 13
           }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: log.userName
+            children: log.label
           }, void 0, false, {
             fileName: _jsxFileName,
             lineNumber: 23,
             columnNumber: 13
           }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
-            children: log.timestamp
+            children: log.userName
           }, void 0, false, {
             fileName: _jsxFileName,
             lineNumber: 24,
+            columnNumber: 13
+          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
+            children: log.timestamp
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 25,
             columnNumber: 13
           }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)("td", {
             children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
@@ -4962,12 +4968,12 @@ function ObserverLogDetails({
               children: "Delete"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 26,
+              lineNumber: 27,
               columnNumber: 15
             }, this)
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 25,
+            lineNumber: 26,
             columnNumber: 13
           }, this)]
         }, void 0, true, {
@@ -4988,7 +4994,7 @@ function ObserverLogDetails({
       children: "Analyses"
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 33,
+      lineNumber: 34,
       columnNumber: 7
     }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxDEV)(_AnalysesTable__WEBPACK_IMPORTED_MODULE_1__["default"], {
       analyses: analyses,
@@ -4996,7 +5002,7 @@ function ObserverLogDetails({
       onAnalyze: onAnalyze
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 34,
+      lineNumber: 35,
       columnNumber: 7
     }, this)]
   }, void 0, true);
@@ -5042,22 +5048,28 @@ function ObserverLogTable({
           lineNumber: 13,
           columnNumber: 13
         }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: log.label
+          children: log.publishedVersion
         }, void 0, false, {
           fileName: _jsxFileName,
           lineNumber: 14,
           columnNumber: 13
         }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: log.userName
+          children: log.label
         }, void 0, false, {
           fileName: _jsxFileName,
           lineNumber: 15,
           columnNumber: 13
         }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
-          children: log.timestamp
+          children: log.userName
         }, void 0, false, {
           fileName: _jsxFileName,
           lineNumber: 16,
+          columnNumber: 13
+        }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
+          children: log.timestamp
+        }, void 0, false, {
+          fileName: _jsxFileName,
+          lineNumber: 17,
           columnNumber: 13
         }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("td", {
           children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
@@ -5067,12 +5079,12 @@ function ObserverLogTable({
             children: "View"
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 18,
+            lineNumber: 19,
             columnNumber: 15
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 17,
+          lineNumber: 18,
           columnNumber: 13
         }, this)]
       }, log.id, true, {
@@ -5114,22 +5126,28 @@ function ObserverLogTableHeader() {
         lineNumber: 5,
         columnNumber: 21
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
-        children: "Label"
+        children: "Published Version"
       }, void 0, false, {
         fileName: _jsxFileName,
         lineNumber: 6,
         columnNumber: 21
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
-        children: "Username"
+        children: "Label"
       }, void 0, false, {
         fileName: _jsxFileName,
         lineNumber: 7,
         columnNumber: 21
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
-        children: "Timestamp"
+        children: "Username"
       }, void 0, false, {
         fileName: _jsxFileName,
         lineNumber: 8,
+        columnNumber: 21
+      }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)("th", {
+        children: "Timestamp"
+      }, void 0, false, {
+        fileName: _jsxFileName,
+        lineNumber: 9,
         columnNumber: 21
       }, this)]
     }, void 0, true, {
@@ -7166,8 +7184,7 @@ type: indicates whether the action is Required, Contraindicated, Unnecessary, Ir
     Irrelevent: it will be listed on the right side under a list of irrelevant actions that the student performed
     accompanied by the feedback on the feedbackErrors field.
     Optional: it will be accepted as correct if performed. We are considering it the same as Unnecessary.
-    Alternative: will be used for those interventions that can be performed as alternative to required ones. A field
-    AlternativeToIntv will be added to indicate the intervention to which it is an alternative.
+    Alternative: will be used for those interventions that can be performed as alternative to required ones.
 AlternativeToIntv: indicates the intervention for which the current one is an alternative. It will only have a value if
 the type is Alternative.
 feedbackAbsent: feedback given if the action was no performed
@@ -7689,7 +7706,7 @@ const B5CA_PhaseIE = {
           subActions: []
         },
         /*{
-          id: "", /* no id provided
+          id: "", /* this may end up as part of checking that breathing intv are working
           label: "Listen for a rush of air after decompressing the patient's lung",
           type: ACTION_TYPES.REQ,
           feedbackAbsent: [""],
@@ -7713,7 +7730,7 @@ const B5CA_PhaseIE = {
           subActions: []
         }, {
           id: "reassess-AB",
-          label: "Check that airway/breathing interventions are working by requesting relevant vitals--in particular, BP, HR, and SpO2",
+          label: "Check that breathing management interventions are working by listening for a rush of air, listening for bilateral lung sounds, and requesting relevant vitals--in particular, BP, P, R, and SpO2",
           type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
           feedbackAbsent: [""],
           feedbackOutOfOrder: [""],
@@ -8505,17 +8522,6 @@ const B5CA_PhaseIE = {
         subActionsList: false,
         subActions: []
       }, {
-        id: "intv-spinal-immobilization-technique-attach-cid",
-        label: "Attach CID to further prevent spinal motion",
-        type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
-        feedbackAbsent: [""],
-        feedbackOutOfOrder: [""],
-        feedbackErrors: [""],
-        examine: false,
-        prompts: "",
-        subActionsList: false,
-        subActions: []
-      }, {
         id: "Reassess the patient",
         label: "Reassess the patient",
         type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
@@ -8563,7 +8569,7 @@ const B5CA_PhaseIE = {
         id: "intv-control-shock-technique-keep-patient-warm",
         label: "keeping the patient warm, using some of the following methods: a) applying heat packs to the patient's groin or armpits, b) covering the patient with blankets, c) turning the heat up in the ambulance.",
         type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
-        feedbackAbsent: [""],
+        feedbackAbsent: ["This patient is hypotensive with a fast heart rate, suggesting possible shock. Patients in shock have trouble maintaining their body temperatures, so they should be kept warm. It is important to keep this patient warm because hypothermia can cause additional problems or worsening of the patient's current problems, including worsening hypotension, arrhythmias, or even cardiac arrest."],
         feedbackOutOfOrder: [""],
         feedbackErrors: [""],
         examine: false,
@@ -8582,8 +8588,8 @@ const B5CA_PhaseIE = {
         subActionsList: false,
         subActions: []
       }, {
-        id: "intv-control-shock-technique-administer-iv-boluses",
-        label: "Bolus normal saline or Lactated Ringers to a maintain BP of 90mm Hg systolic en route, if time allows",
+        id: "intv-contact-receiving-facility",
+        label: "Provide a patient report and ETA to the receiving facility",
         type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
         feedbackAbsent: [""],
         feedbackOutOfOrder: [""],
@@ -8593,14 +8599,29 @@ const B5CA_PhaseIE = {
         subActionsList: false,
         subActions: []
       }, {
-        id: "intv-contact-receiving-facility",
-        label: "Provide a patient report and ETA to the receiving facility",
-        type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
+        id: "intv-spinal-immobilization-technique-attach-cid",
+
+        /* optional intervention */
+        label: "Attach CID to further prevent spinal motion",
+        type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.OPT,
         feedbackAbsent: [""],
         feedbackOutOfOrder: [""],
         feedbackErrors: [""],
         examine: false,
         prompts: "",
+        subActionsList: false,
+        subActions: []
+      }, {
+        id: "intv-control-shock-technique-administer-iv-boluses",
+
+        /* unnecessary intervention */
+        label: "Bolus normal saline or Lactated Ringers to a maintain BP of 90mm Hg systolic en route, if time allows",
+        type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.UNNEC,
+        feedbackAbsent: [""],
+        feedbackOutOfOrder: [""],
+        feedbackErrors: ["While it is true the patient was hypotensive, the reason for his hypotension was because of obstructive shock, not hypovolemia. Appropriate management of the patient's tension pneumothorax would allow resumption of adequate cardiac output, resulting in an improved BP and exam. This patient does have a penetrating chest wound, however, so should he remain hypotensive after you successfully treated his tension pneumothorax, you should consider hemorrhagic shock; at this point, fluid resuscitation may be appropriate."],
+        examine: true,
+        prompts: "Thought that hypotension should be treated with fluid boluses regardless of etiology",
         subActionsList: false,
         subActions: []
       }
@@ -16188,12 +16209,31 @@ const getObserverLogAnalyses = (db, observerLogID) => {
     return [];
   });
 };
+
+const getPublishedScenarios = (logs, pubScens, pubScenIDs, onlyPublished) => {
+  let filtered = [];
+
+  for (let log of logs) {
+    if (pubScenIDs.includes(log.scenarioID)) {
+      let version = pubScens.find(s => s.id === log.scenarioID).version;
+      log.publishedVersion = version;
+      filtered.push(log);
+    }
+  }
+
+  if (onlyPublished) {
+    return filtered.sort((a, b) => a.publishedVersion.localeCompare(b.publishedVersion));
+  } else {
+    return logs.sort((a, b) => a.publishedVersion.localeCompare(b.publishedVersion));
+  }
+};
+
 const getObserverLogList = async (db, onlyPublished = true) => {
   // by default, only lists observer logs which don't refer to currently 
   // published scenarioIDs
   const pubScens = await getPubScenarios(db);
   const pubScenIDs = pubScens.map(e => e.id);
-  return db.collection("logs").get().then(querySnapshot => querySnapshot.docs.map(doc => exportObserverLogMetaData(doc))).then(logs => onlyPublished ? logs.filter(e => pubScenIDs.includes(e.scenarioID)) : logs).catch(error => {
+  return db.collection("logs").get().then(querySnapshot => querySnapshot.docs.map(doc => exportObserverLogMetaData(doc))).then(logs => getPublishedScenarios(logs, pubScens, pubScenIDs, onlyPublished)).catch(error => {
     console.error(error);
     return [];
   });
