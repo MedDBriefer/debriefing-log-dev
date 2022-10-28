@@ -100,7 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 // When building for production, this file is replaced with `environment.prod.ts`.
 const environment = {
   production: false,
-  firebaseProject: ({"NODE_ENV":"development","NX_CLI_SET":"true","NX_WORKSPACE_ROOT":"/Users/user/Projects/monorepo","NX_TERMINAL_OUTPUT_PATH":"/Users/user/Projects/monorepo/node_modules/.cache/nx/terminalOutputs/d9ff7f4ed3a1fce126d550aca077b7b54422de0c5903d6acc8d48815942a3d08","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"debriefer","NX_TASK_HASH":"d9ff7f4ed3a1fce126d550aca077b7b54422de0c5903d6acc8d48815942a3d08"}).NX_FIREBASE_PROJECT || "MedDBriefer"
+  firebaseProject: "MedDBrieferDev" || 0
 };
 
 /***/ }),
@@ -389,7 +389,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-let debugSummarize = true;
+let debugSummarize = false;
 let problemStates;
 let cautionStates;
 let constraintsViolated = [];
@@ -993,10 +993,6 @@ const annotateInputEvents = (events, problems) => {
         }
 
         eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_9__.processAssessmentAnswers)(event, eventObj, prescribedAnswers, "decision-option-incorrect");
-
-        if (!eventObj.answerCorrect) {
-          eventObj.incorrectAnswersFB = "You should have responded " + eventObj.incorrectAnswersFB;
-        }
       }
 
       if (eventObj.type === "assessment-option") {
@@ -1008,10 +1004,6 @@ const annotateInputEvents = (events, problems) => {
         }
 
         eventObj = (0,_meddebriefer_prompt_answer_grading__WEBPACK_IMPORTED_MODULE_9__.processAssessmentAnswers)(event, eventObj, prescribedAnswers, "assessment-option-incorrect");
-
-        if (!eventObj.answerCorrect) {
-          eventObj.incorrectAnswersFB = "You should have responded " + eventObj.incorrectAnswersFB;
-        }
       } // add the formatted object to our list of formatted objects for the current phase and the id to our set of confirmed ids
 
 
@@ -2119,6 +2111,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "pushNew": () => (/* binding */ pushNew),
 /* harmony export */   "saveAnalysisLog": () => (/* binding */ saveAnalysisLog),
 /* harmony export */   "saveCommentLog": () => (/* binding */ saveCommentLog),
+/* harmony export */   "saveGradingLog": () => (/* binding */ saveGradingLog),
 /* harmony export */   "saveLog": () => (/* binding */ saveLog),
 /* harmony export */   "scenarios": () => (/* binding */ scenarios),
 /* harmony export */   "trimAction": () => (/* binding */ trimAction),
@@ -2126,13 +2119,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9205);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6957);
+/* harmony import */ var _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8913);
+/* harmony import */ var _scenarioDataAccesors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4548);
  //import {  requiredPhaseNames } from "./analyzeEvents";
 // constraintsViolated,
 // import { c2FB } from "./summarizeAnalysis";
 
+ //import { itemByID } from './analyzeEvents'
+
+
 
 
 const _ = __webpack_require__(6635);
+
+let recreate = false; //a true setting will cause the observer log to be recreated from the analysis log whenever a save is done during review.  The recreated
+//log is saved in the recreatedLog collection
+
+let gradingReport = false; //a true setting will true the analysis log into a format that may be better for human grading/analysis
 
 const C2_FIELDS = ["feedbackAbsent", "feedbackOutOfOrder", "feedbackErrors"];
 const scenarios = {
@@ -2351,11 +2354,11 @@ function getFBField(currentEntry, field, c2FB) {
           break;
 
         case "why":
-          if (fb && status.includes("contraindicated", "unnecessary", "irrelevant") && fb.feedbackErrors && fb.feedbackErrors[0] !== "") {
+          if (fb && ["contraindicated", "unnecessary", "irrelevant"].includes(status) && fb.feedbackErrors && fb.feedbackErrors[0] !== "") {
             result = fb.feedbackErrors;
           }
 
-          if (fb && !status.includes("contraindicated", "unnecessary", "irrelevant") && fb.feedbackAbsent && fb.feedbackAbsent[0] !== "") {
+          if (fb && !["contraindicated", "unnecessary", "irrelevant"].includes(status) && fb.feedbackAbsent && fb.feedbackAbsent[0] !== "") {
             result = fb.feedbackAbsent;
           }
 
@@ -2364,7 +2367,7 @@ function getFBField(currentEntry, field, c2FB) {
         case "incorrectAnswersFB":
           //get from c2 ds field feedbackErrors
           if (fb && fb.feedbackErrors && fb.feedbackErrors[0] !== "") {
-            result = fb.feedbackErrors;
+            result = fixStrSp(currentEntry[field]) + ".\xa0\xa0" + fb.feedbackErrors;
           }
 
           break;
@@ -2619,7 +2622,7 @@ var scenarioConstraints = {}; // adds on scenario specific constraints where the
 const initializeConstraints = scenarioName => {
   // look up applicable conditional constraints from const structure scenarioConstraintIDs
   let constraintIDs = _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_0__.scenarioConstraintIDs[scenarioName];
-  initialConstraints = _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_0__.globalConstraints;
+  initialConstraints = JSON.parse(JSON.stringify(_meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_0__.globalConstraints));
 
   if (!!constraintIDs && constraintIDs.length !== 0) {
     for (const [key, val] of Object.entries(_meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_0__.conditionalConstraints)) {
@@ -2751,14 +2754,125 @@ const saveAnalysisLog = async (db, obsLog, analysisData, userName) => {
     } else {
       data["events"] = actions;
     }
-  } //console.log("about to save data", data)
+  } //window.alert(`analyzed-log/${data.label} created`); 
+  //console.log("about to save data", data)
 
 
   const dataWithID = await saveLog(db, "analyzed-logs", undefined, data); //window.alert(`analyzed-log/${data.label} created`); 
 
   return dataWithID;
 };
-const saveCommentLog = async (db, priorLog, id, comments, userName) => {
+const ITEM_FIELDS = ["abbrLabel", "depth", "graded", "parentID", "phase", "subPhase"];
+const OB_FIELDS = ["id", "label", "type", "finding", "vitalType", "vital", "value", "prompt", "promptID", "intvVariant", "patientStatus", "performedCorrectly", "timestamp"];
+
+const initializeItemLookupByID = scenario => {
+  let checklistLookupByID = (0,_scenarioDataAccesors__WEBPACK_IMPORTED_MODULE_3__.groupByKey)(scenario._checkListMetaData.filter(e => _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_2__.ANALYSIS_TYPES.includes(e.type)), "id");
+  let intvLookupByID;
+
+  if (!!scenario._interventions) {
+    intvLookupByID = (0,_scenarioDataAccesors__WEBPACK_IMPORTED_MODULE_3__.groupByKey)(scenario._interventions, "id");
+  } else {
+    intvLookupByID = (0,_scenarioDataAccesors__WEBPACK_IMPORTED_MODULE_3__.groupByKey)(scenario.intvMetaData.filter(e => _meddbriefer_scenario_data__WEBPACK_IMPORTED_MODULE_2__.ANALYSIS_TYPES.includes(e.type)), "id");
+  }
+
+  let result = Object.assign(checklistLookupByID, intvLookupByID);
+  return result;
+};
+
+const initializeByAnswerLabel = scenario => {
+  let result = (0,_scenarioDataAccesors__WEBPACK_IMPORTED_MODULE_3__.groupByKey)(scenario._interventionPromptAnswers, "label" || 0);
+  return result;
+};
+
+const createObsLogFromAnalysisLog = async (db, scenario, anaLog, actions) => {
+  let itemByID = initializeItemLookupByID(scenario);
+  let byAnswerLabel = initializeByAnswerLabel(scenario);
+  let data = {
+    "label": anaLog.label || "",
+    "userName": anaLog.analyzer || "",
+    "classCode": anaLog.classCode || "",
+    "condition": anaLog.condition || "",
+    "scenarioName": anaLog.scenarioName || "",
+    "timestamp": Date()
+  };
+  let newActions = [];
+  actions.forEach(function (logObj, index) {
+    if (logObj.numericalID >= 1 && logObj.timestamp !== -1) {
+      let newObj = {};
+      OB_FIELDS.forEach(fldName => {
+        if (!!logObj[fldName] && logObj[fldName] !== undefined) {
+          newObj[fldName] = logObj[fldName];
+        }
+      });
+      let item = getItem(logObj.id, itemByID, []);
+
+      if (item) {
+        ITEM_FIELDS.forEach(fldName => {
+          if (!!item[fldName] && item[fldName] !== undefined) {
+            newObj[fldName] = item[fldName];
+          }
+        });
+      }
+
+      if (newObj.type === "intervention") {
+        newObj.interventionID = newObj.id;
+      }
+
+      if (!!logObj.answerDetails) {
+        let answers = {};
+
+        for (const [key, value] of Object.entries(logObj.answerDetails)) {
+          let answerID = byAnswerLabel[value.givenAnswer];
+
+          if (!answerID) {
+            console.log("answerID not found for: ", value.givenAnswer);
+          } else {
+            answers[key] = [answerID[0].id];
+          }
+        }
+
+        newObj.answers = answers;
+      }
+
+      newActions.push(newObj);
+    }
+  });
+  data["events"] = newActions;
+  console.log("saving recreated log: ", data);
+  const dataWithID = await saveLog(db, "recreatedLogs", undefined, data);
+  return dataWithID;
+}; //log input needs to be an analysis log
+
+
+const saveGradingLog = async (db, log, actions) => {
+  let data = {
+    "label": log.label,
+    "analyzer": log.analyzer || "",
+    "classCode": log.classCode || "",
+    "condition": log.condition || "",
+    "scenarioName": log.scenarioName,
+    "timestamp": Date()
+  };
+  actions.forEach(function (logObj, index) {
+    if (logObj.numericalID >= 1) {
+      if (!data[logObj.id]) {
+        data[logObj.id] = logObj.status;
+      } else {
+        for (let index = 1; index < 10; index++) {
+          if (!data[logObj.id + index]) {
+            data[logObj.id + index] = logObj.status;
+            break;
+          }
+        }
+      }
+    }
+  }); //console.log("about to save data", data)
+
+  const dataWithID = await saveLog(db, "grading-logs", undefined, data); //window.alert(`analyzed-log/${data.label} created`); 
+
+  return dataWithID;
+};
+const saveCommentLog = async (db, scenario, priorLog, id, comments, userName) => {
   let data = {
     label: priorLog.label || null,
     reviewer: userName,
@@ -2770,6 +2884,15 @@ const saveCommentLog = async (db, priorLog, id, comments, userName) => {
     comments: comments,
     timestamp: Date()
   };
+
+  if (recreate) {
+    createObsLogFromAnalysisLog(db, scenario, priorLog, priorLog["events"]);
+  }
+
+  if (gradingReport) {
+    saveGradingLog(db, priorLog, priorLog["events"]);
+  }
+
   await saveLog(db, "cond1-comments", id, data); //window.alert(`cond1-comments/${priorLog.label} saved`); 
   // return savedData
 }; // export const saveAsCommentLog = (db, priorLog, comments, userName) => {
@@ -3318,6 +3441,7 @@ __webpack_require__.r(__webpack_exports__);
 const summaryFields = ["label", "status", "phaseOrderStatus", "phase", "subPhase", "labelID", "phaseID", "probLabel", "answerCorrect", "answerDetails", "timestamp", "type"]; // globals
 
 let analysis; // helper functions
+//TODO: should be a loop!!!
 //regularize status values, by examining status values grouped into categories
 //of good, error, etc
 
@@ -3362,39 +3486,54 @@ function determineStatusOfNotFound(id, promptIDarray) {
 
 function examineDups(events) {
   let newEvent;
-  /* let misordered = false
-  let noError = false
-  let interimEvent
-   // will eventually need to separate any with variants from under the same eventID as not being
+  let misordered = false;
+  let noError = false;
+  let interimEvent; // will eventually need to separate any with variants from under the same eventID as not being
   //duplicatea.  But for now we have no feedback for variants so can ignore variants for now.
-   //regularize status of each instance of event 
+  //regularize status of each instance of event 
   //if any of the dups of event is without an error then can say there
   //are no errors.
   //However, if any of the dups are misordered then can report it as
   //misOrdered in the summary
-  for (const event of events) {
-    interimEvent = regularizeStatus(event)
-    if (!["error", "misOrderedError"].includes(interimEvent.status)){
-      noError = true
-    }
-    if (["misOrdered", "misOrderedError"].includes(interimEvent.status)){
-      misordered = true
-    }
-    if (misordered && noError){
-      break
-    }
-  } */
 
   newEvent = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.trimAction)(events[events.length - 1], summaryFields);
-  /* if (noError && !misordered) {
-    newEvent.status = "good"
+
+  if (events.length > 1) {
+    for (const event of events) {
+      interimEvent = regularizeStatus(event);
+
+      if (!["error", "misorderedError"].includes(interimEvent.status)) {
+        //absent can't happen because if dups then wouldn't insert it was absent
+        noError = true;
+      }
+
+      if (["misordered", "misorderedError"].includes(interimEvent.status)) {
+        misordered = true;
+      }
+
+      if (misordered && noError) {
+        break;
+      }
+    }
+
+    newEvent = regularizeStatus(newEvent);
+
+    if (!misordered) {
+      if (!noError) {
+        newEvent.status = "error";
+      } else {
+        newEvent.status = "good";
+      }
+    } else {
+      if (noError) {
+        newEvent.status = "misordered";
+      } else {
+        newEvent.status = "misorderedError";
+      }
+    }
+  } else {
+    newEvent = regularizeStatus(newEvent);
   }
-  if (misordered && noError){
-    newEvent.status = "misOrdered"
-  }
-  if (misordered && !noError){
-    newEvent.stuatus = "misorderedError"
-  } */
 
   return newEvent;
 }
@@ -3412,6 +3551,7 @@ function processNextLevel(summary, top, decisionPromptIDs) {
   };
 
   if (top.subActions.length === 0) {
+    //at a leaf node
     events = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_0__.getEvents)(analysis, "id", top.id);
 
     if (events.length !== 0) {
@@ -4500,7 +4640,7 @@ function GetReview({
     event.preventDefault(); // probably unneeded
     // analysisLog.id = undefined
 
-    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.saveCommentLog)(db, analysisLog, logID, comments, userName);
+    (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_6__.saveCommentLog)(db, scenario, analysisLog, logID, comments, userName);
   }; // const saveAsCommentLogLocally = () => {
   //     analysisLog = saveAsCommentLog(db, analysisLog, comments , userName)
   // }
@@ -7553,7 +7693,7 @@ const B4CA_PhaseIE = {
       }]
     }, {
       id: "ongoing-mgmt-plan",
-      label: "Continue to provide adequate prehospital care until arriving at the receiving faciliaty",
+      label: "Continue to provide adequate prehospital care until arriving at the receiving facility",
       type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
       feedbackAbsent: [""],
       feedbackOutOfOrder: [""],
@@ -9384,7 +9524,7 @@ const B5CA_PhaseIE = {
       }]
     }, {
       id: "ongoing-mgmt-plan",
-      label: "Continue to provide adequate prehospital care until arriving at the receiving faciliaty",
+      label: "Continue to provide adequate prehospital care until arriving at the receiving facility",
       type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
       feedbackAbsent: ["It is important to reassess your patient after every intervention and every clinical change. This includes repeating the primary survey, secondary survey, and vital signs. A critically ill patient should be reassessed more frequently to ensure he or she is still stable--approximately every 5 minutes."],
       feedbackOutOfOrder: [""],
@@ -15788,7 +15928,7 @@ const iconTypes = {
 
 const fbTemplatesDef = {
   // state: [categorization for feedback, feedback template for condition 1]
-  "contraindicated": ["Problem", "+bec Incorrect intervention +eec +bos ?why +eos"],
+  "contraindicated": ["Problem", "+bec Contraindicated intervention +eec +bos ?why +eos"],
   "irrelevant": ["Problem", "+bec Irrelevant intervention +eec +bos ?why +eos"],
   "unnecessary": ["Problem", "+bec Unnecessary intervention +eec +bos ?why +eos"],
   "redundant": ["Problem", "+bec Redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
@@ -15810,7 +15950,7 @@ const fbTemplatesDef = {
   "misOrdered-assessment": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB +eos"],
   "misOrdered-assessment-option": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB +eos"],
   "misOrdered-decision-option": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB"],
-  "misOrdered-required-action": ["Problem", "+bec Mistimed intervention +eec +bos @orderingFB"],
+  "misOrdered-required-action": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB"],
   "misOrdered-optional": ["Problem", "+bec Mistimed intervention +eec +bos @orderingFB"],
   "misOrdered-redundant": ["Problem", "+bec Redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
   //don't give additional feedback on redudant intervention
@@ -15837,28 +15977,28 @@ const fbTemplatesDef = {
   //currently any patient vital check that is done is fine
   "assessment-option-incorrect": ["Problem", "+bec Incorrect assessment step +eec +bos @incorrectAnswersFB +eos "],
   "decision-option-incorrect": ["Problem", "+bec Incorrect assessment step +eec +bos @incorrectAnswersFB +eos "],
-  "incorrect-answers": ["Problem", "+bec Incorrect intervention +eec +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
-  "optional-incorrect-answers": ["Problem", "+bec Incorrect intervention +eec +bos ?why +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
-  "redundant-incorrect-answers": ["Problem", "+bec Redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
+  "incorrect-answers": ["Problem", "+bec Incorrectly administered intervention +eec +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
+  "optional-incorrect-answers": ["Problem", "+bec Incorrectly administered intervention +eec +bos ?why +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
+  "redundant-incorrect-answers": ["Problem", "+bec Redundant and incorrectly administered intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
   //minimal is no longer guaranteed to work so could remove these once verified by redesign of analysis software
-  "minimal-incorrect-answers": ["Problem", "+bec Incorrect intervention and violated protocol +eec +bos ?minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
+  "minimal-incorrect-answers": ["Problem", "+bec Incorrectly administered intervention and violated protocol +eec +bos ?minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
   "minimal": ["Caution", "+bec Violated protocol +eec +bos @minimalWhy +bos ?intvStatusFB +eos "],
   "misOrdered-assessment-option-incorrect": ["Problem", "+bec Incorrect, mistimed assessment step +eec +bos @orderingFB +bos @incorrectAnswersFB +eos "],
   "misOrdered-decision-option-incorrect": ["Problem", "+bec Incorrect, mistimed assessment step +eec +bos @orderingFB +bos @incorrectAnswersFB +eos "],
-  "misOrdered-incorrect-answers": ["Problem", "+bec Incorrect, mistimed intervention +eec +bos @orderingFB +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
-  "misOrdered-optional-incorrect-answers": ["Problem", "+bec Incorrect, mistimed intervention  +eec +bos ?why +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
-  "misOrdered-redundant-incorrect-answers": ["Problem", "+bec Redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
+  "misOrdered-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @orderingFB +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
+  "misOrdered-optional-incorrect-answers": ["Problem", "+bec Incorrectly administerd, mistimed intervention  +eec +bos ?why +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
+  "misOrdered-redundant-incorrect-answers": ["Problem", "+bec Incorrectly administered, redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
   //minimal is no longer guaranteed to work so could remove these once verified during optimization of all design changes
-  "misOrdered-minimal-incorrect-answers": ["Problem", "+bec Incorrect, mistimed intervention +eec +bos @orderingFB +bos @minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
-  "misOrdered-minimal": ["Problem", "+bec Incorrect, mistimed intervention +eec +bos @orderingFB +bos @minimalWhy +bos ?intvStatusFB +eos"],
+  "misOrdered-minimal-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @orderingFB +bos @minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
+  "misOrdered-minimal": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @orderingFB +bos @minimalWhy +bos ?intvStatusFB +eos"],
   //once analysis software re-written to optimaize all design changes, this section can be eliminated
   //since we are no longer placing the phase feedback in the first item of a phase
   "misOrdered-phase-assessment-option-incorrect": ["Problem", "+bec Incorrect, mistimed assessment step +eec +bos @incorrectAnswersFB +bos @orderingFB +eos "],
   "misOrdered-phase-decision-option-incorrect": ["Problem", "+bec Incorrect, mistimed assessment step  +eec +bos @incorrectAnswersFB +bos @orderingFB +eos "],
-  "misOrdered-phase-incorrect-answers": ["Problem", "+bec Incorrect, mistimed intervention +eec +bos @incorrectAnswersFB +bos @orderingFB +bos ?intvStatusFB +eos"],
-  "misOrdered-phase-optional-incorrect-answers": ["Problem", "+bec Incorrect, mistimed intervention +eec +bos ?why +bos @incorrectAnswersFB +bos @orderingFB +bos ?intvStatusFB +eos"],
+  "misOrdered-phase-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @incorrectAnswersFB +bos @orderingFB +bos ?intvStatusFB +eos"],
+  "misOrdered-phase-optional-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos ?why +bos @incorrectAnswersFB +bos @orderingFB +bos ?intvStatusFB +eos"],
   "misOrdered-phase-redundant-incorrect-answers": ["Problem", "+bec Redundant, mistimed intervention +eec +bos You already did an alternative to this: @redundantToFB +bos @orderingFB +eos"],
-  "misOrdered-phase-minimal-incorrect-answers": ["Problem", "+bec Incorrect, mistimed intervention +eec +bos @orderingFB +bos ?minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
+  "misOrdered-phase-minimal-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @orderingFB +bos ?minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
   "misOrdered-phase-minimal": ["Problem", "+bec Misordered +eec +bos @orderingFB +bos ?minimalWhy +bos ?intvStatusFB +eos"],
   "green": ["Good", ""],
   //just for headers
@@ -17610,13 +17750,89 @@ const StaffRoute = _ref => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MDBModal": () => (/* reexport safe */ _lib_modal__WEBPACK_IMPORTED_MODULE_2__.MDBModal),
 /* harmony export */   "MDBNavBar": () => (/* reexport safe */ _lib_navbar_MDBNavBar__WEBPACK_IMPORTED_MODULE_1__.MDBNavBar),
 /* harmony export */   "Snackbar": () => (/* reexport safe */ _lib_snackbar_Snackbar__WEBPACK_IMPORTED_MODULE_0__.Snackbar),
 /* harmony export */   "useSnackbar": () => (/* reexport safe */ _lib_snackbar_Snackbar__WEBPACK_IMPORTED_MODULE_0__.useSnackbar)
 /* harmony export */ });
 /* harmony import */ var _lib_snackbar_Snackbar__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4106);
 /* harmony import */ var _lib_navbar_MDBNavBar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3042);
+/* harmony import */ var _lib_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6918);
 
+
+
+
+/***/ }),
+
+/***/ 210:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ MDBModal)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2784);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(9939);
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4278);
+/* harmony import */ var reactstrap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(3743);
+/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9663);
+var _jsxFileName = "/Users/user/Projects/monorepo/libs/mdb-ui/src/lib/modal/MDBModal.jsx";
+
+
+
+function MDBModal({
+  title,
+  show,
+  dismiss,
+  size = "xl",
+  children
+}) {
+  return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    isOpen: show,
+    toggle: dismiss,
+    size: size,
+    backdrop: "static",
+    children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      toggle: dismiss,
+      children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)("span", {
+        className: "h2",
+        children: title
+      }, void 0, false, {
+        fileName: _jsxFileName,
+        lineNumber: 16,
+        columnNumber: 17
+      }, this)
+    }, void 0, false, {
+      fileName: _jsxFileName,
+      lineNumber: 15,
+      columnNumber: 13
+    }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxDEV)(reactstrap__WEBPACK_IMPORTED_MODULE_4__["default"], {
+      children: children
+    }, void 0, false, {
+      fileName: _jsxFileName,
+      lineNumber: 18,
+      columnNumber: 13
+    }, this)]
+  }, void 0, true, {
+    fileName: _jsxFileName,
+    lineNumber: 9,
+    columnNumber: 9
+  }, this);
+}
+
+/***/ }),
+
+/***/ 6918:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MDBModal": () => (/* reexport safe */ _MDBModal__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _MDBModal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(210);
 
 
 /***/ }),
@@ -17943,10 +18159,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_includes_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var core_js_modules_es_string_includes_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1235);
 /* harmony import */ var core_js_modules_es_string_includes_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_includes_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5735);
-/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6886);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7950);
+/* harmony import */ var core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_exec_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8319);
+/* harmony import */ var core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_split_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var core_js_modules_es_string_trim_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(5794);
+/* harmony import */ var core_js_modules_es_string_trim_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_trim_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5735);
+/* harmony import */ var core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6886);
+/* harmony import */ var core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator_js__WEBPACK_IMPORTED_MODULE_6__);
+
+
+
 
 
 
@@ -17979,6 +18204,16 @@ function getAnswerIDs(scen) {
   }
 }
 
+function getPromptLabel(promptID) {
+  let prompt = prompts.find(e => e.id === promptID);
+
+  if (prompt) {
+    return prompt.abbrLabel || prompt.label;
+  } else {
+    return null;
+  }
+}
+
 function getPrescribedInvAnswers(interventionID, variantDef) {
   let intvEntry = scenario.interventionVariantAnswers[interventionID];
 
@@ -18000,17 +18235,20 @@ function processAssessmentAnswers(eventIn, eventOut, prescribedAnswers, errorSta
     let answerDetails;
     let correctAnswerLabel;
     let givenAnswerLabel;
+    let promptLabel;
     eventOut.answerCorrect = true;
     let promptID = eventIn.parentID;
     let answerID = eventIn.id;
     let correctAnswerIDs = prescribedAnswers[promptID];
     correctAnswerLabel = getAnswerLabels(correctAnswerIDs, "one-or-more");
     givenAnswerLabel = getAnswerLabel(answerID);
+    promptLabel = getPromptLabel(promptID);
 
     if (correctAnswerLabel && givenAnswerLabel) {
       let answerCorrect = correctAnswerIDs.includes(answerID); //store details of this answer and its grading
 
       answerDetails = {
+        "promptLabel": promptLabel,
         "correctAnswer": correctAnswerLabel,
         "givenAnswer": givenAnswerLabel,
         "correct": answerCorrect
@@ -18021,11 +18259,18 @@ function processAssessmentAnswers(eventIn, eventOut, prescribedAnswers, errorSta
       if (!answerCorrect) {
         eventOut.answerCorrect = false;
         eventOut.status = errorStatusVal;
+        let label = correctAnswerLabel.split(":", 1)[0];
+
+        if (label) {
+          label = label.trim().toLowerCase();
+        } else {
+          label = "";
+        }
 
         if (eventOut.incorrectAnswersFB) {
-          eventOut.incorrectAnswersFB = eventOut.incorrectAnswersFB + ", and " + correctAnswerLabel;
+          eventOut.incorrectAnswersFB = eventOut.incorrectAnswersFB + ", and " + label;
         } else {
-          eventOut.incorrectAnswersFB = correctAnswerLabel;
+          eventOut.incorrectAnswersFB = label;
         }
       }
     }
@@ -18034,6 +18279,11 @@ function processAssessmentAnswers(eventIn, eventOut, prescribedAnswers, errorSta
   eventOut.id = eventIn.parentID;
   eventOut.label = eventIn.parentLabel;
   eventOut.actionDescription = eventOut.label;
+
+  if (!eventOut.answerCorrect) {
+    eventOut.incorrectAnswersFB = "You were incorrect about " + eventOut.incorrectAnswersFB;
+  }
+
   return eventOut;
 } //eventIn is the observer log event and eventOut is the event
 //being annotated during analysis
@@ -18043,6 +18293,7 @@ function processInterventionAnswers(eventIn, eventOut, prescribedAnswers, errorS
     let answerDetails;
     let correctAnswerLabel;
     let givenAnswerLabel;
+    let promptLabel;
     eventOut.answerCorrect = true; // move through the given answers and compare to the prescribed answers
 
     for (const [promptID, answerEntry] of Object.entries(eventIn.answers)) {
@@ -18052,12 +18303,14 @@ function processInterventionAnswers(eventIn, eventOut, prescribedAnswers, errorS
       let correctAnswerIDs = prescribedAnswers[promptID];
       correctAnswerLabel = getAnswerLabels(correctAnswerIDs, answerType);
       givenAnswerLabel = getAnswerLabels(answerIDs, answerType);
+      promptLabel = getPromptLabel(promptID);
 
       if (correctAnswerLabel && givenAnswerLabel) {
         //need to extract answerType from somewhere
         let answerCorrectness = evalAnswers(answerIDs, correctAnswerIDs, answerType); //store details of this answer and its grading
 
         answerDetails = {
+          "promptLabel": promptLabel,
           "correctAnswer": correctAnswerLabel,
           "givenAnswer": givenAnswerLabel,
           "correct": answerCorrectness
@@ -18068,14 +18321,25 @@ function processInterventionAnswers(eventIn, eventOut, prescribedAnswers, errorS
         if (!answerCorrectness) {
           eventOut.answerCorrect = false;
           eventOut.status = errorStatusVal;
+          let label = correctAnswerLabel.split(":", 1)[0];
+
+          if (label) {
+            label = label.trim().toLowerCase();
+          } else {
+            label = "";
+          }
 
           if (eventOut.incorrectAnswersFB) {
-            eventOut.incorrectAnswersFB = eventOut.incorrectAnswersFB + ", and " + correctAnswerLabel;
+            eventOut.incorrectAnswersFB = eventOut.incorrectAnswersFB + ", and " + label;
           } else {
-            eventOut.incorrectAnswersFB = correctAnswerLabel;
+            eventOut.incorrectAnswersFB = label;
           }
         }
       }
+    }
+
+    if (!eventOut.answerCorrect) {
+      eventOut.incorrectAnswersFB = "You were incorrect about " + eventOut.incorrectAnswersFB;
     }
   }
 
@@ -18271,7 +18535,7 @@ function getProjectConfig(projectName) {
         appId: "1:447730403122:web:1727020dbac4ad4cf6f92b"
       };
 
-    case "MedDBriefer-dev":
+    case "MedDBrieferDev":
       return {
         apiKey: "AIzaSyBqnEMwEstp4D7Mvtbw9OTAiNJ7qza0Ses",
         authDomain: "meddbriefer-dev.firebaseapp.com",
