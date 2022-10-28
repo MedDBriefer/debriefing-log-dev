@@ -100,7 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 // When building for production, this file is replaced with `environment.prod.ts`.
 const environment = {
   production: false,
-  firebaseProject: "PamDev   //MedDBrieferDev" || 0
+  firebaseProject: ({"NODE_ENV":"development","NX_CLI_SET":"true","NX_WORKSPACE_ROOT":"/Users/user/Projects/monorepo","NX_TERMINAL_OUTPUT_PATH":"/Users/user/Projects/monorepo/node_modules/.cache/nx/terminalOutputs/6e9c2fe8e367755227c1e7dad4ebd8658018b5bb0ef8f2fa1b8bce1ce4b29447","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"debriefer","NX_TASK_HASH":"6e9c2fe8e367755227c1e7dad4ebd8658018b5bb0ef8f2fa1b8bce1ce4b29447"}).NX_FIREBASE_PROJECT || "MedDBrieferDev"
 };
 
 /***/ }),
