@@ -414,7 +414,7 @@ var itemByLabel; // sts 1/23/22 - added as global
 let checklistHierarchy;
 let training; // analysisFields to include in output
 
-let analysisFields = ["numericalID", "actionDescription", "id", "type", "label", "labelID", "answerDetails", "vital", "vitalType", "value", "subPhase", "finding", "intvStatus", "vitalsNotDoneTwice", "vitalsDoneTwice", "probLabel", "feedback", "phFeedback", "phaseOrderStatus", "why", "orderingFB", "vitalsFB", "incorrectAnswersFB", "intvStatusFB", "redundantToFB", "minimalWhy", "timestamp", "status", "displayColor", "comment"];
+let analysisFields = ["numericalID", "actionDescription", "id", "type", "label", "labelID", "answerDetails", "vital", "vitalType", "value", "subPhase", "finding", "intvStatus", "vitalsNotDoneTwice", "vitalsDoneTwice", "probLabel", "feedback", "phFeedback", "phaseOrderStatus", "lateRelativeTo", "why", "orderingFB", "vitalsFB", "incorrectAnswersFB", "intvStatusFB", "redundantToFB", "minimalWhy", "timestamp", "status", "displayColor", "comment"];
 
 function initGlobals(scen) {
   problemStates = (0,_debriefingUtils__WEBPACK_IMPORTED_MODULE_1__.getStatesForStatus)("Problem", _meddbriefer_feedback_data__WEBPACK_IMPORTED_MODULE_8__.fbTemplatesDef);
@@ -1758,7 +1758,7 @@ const findObjByNumerialID = (numericalID, phases, phaseNames, checklistHierarchy
   }
 };
 
-const storeMisOrderedArgs = (numericalID, arg2, phases, phaseNames, checklistHierarchy) => {
+const storeMisOrderedArgs = (numericalID, lateArg, phases, phaseNames, checklistHierarchy) => {
   let result = findObjByNumerialID(numericalID, phases, phaseNames, checklistHierarchy);
   let objToModify = result[0];
 
@@ -1766,15 +1766,15 @@ const storeMisOrderedArgs = (numericalID, arg2, phases, phaseNames, checklistHie
     console.log("no object found for numericalID = ", numericalID);
   } //just for debugging
   else {
-    if (!objToModify.arg2) {
-      objToModify.arg2 = [arg2.id];
+    if (!objToModify.lateRelativeTo) {
+      objToModify.lateRelativeTo = [lateArg.id];
     } else {
-      objToModify.arg2 = objToModify.arg2.concat([arg2.id]);
+      objToModify.lateRelativeTo = objToModify.lateRelativeTo.concat([lateArg.id]);
     }
   }
 };
 
-const storeMisOrderedFB = (numericalID, lateArg, FB, constraintType, phases, phaseNames, checklistHierarchy, phaseFB) => {
+const storeMisOrderedFB = (numericalID, lateArg, otherArg, FB, constraintType, phases, phaseNames, checklistHierarchy, phaseFB) => {
   let result = findObjByNumerialID(numericalID, phases, phaseNames, checklistHierarchy);
   let objToModify = result[0];
 
@@ -1799,9 +1799,12 @@ const storeMisOrderedFB = (numericalID, lateArg, FB, constraintType, phases, pha
     }
   } else {
     if (!!phaseFB[lateArg]) {
-      phaseFB[lateArg] = phaseFB[lateArg] + ".  " + FB;
+      phaseFB[lateArg].arg2 = phaseFB[lateArg].arg2.concat([otherArg]);
+      phaseFB[lateArg].feedback = phaseFB[lateArg].feedback + ".  " + FB;
     } else {
-      phaseFB[lateArg] = FB;
+      phaseFB[lateArg] = {};
+      phaseFB[lateArg].arg2 = [otherArg];
+      phaseFB[lateArg].feedback = FB;
     }
   }
 }; //flattens out the phases and phaseNames data structures so that all phase and subphase
@@ -1862,9 +1865,9 @@ const saveFailedConstraint = (lateArg, otherArg, constraintID, constraintsViolat
 
   constraintsViolated.push({
     constraintID: constraintID,
-    arg1: lateArg,
+    arg1: lateArg.id,
     op: "before",
-    arg2: otherArg,
+    arg2: otherArg.id,
     type: type
   });
   return type;
@@ -1893,6 +1896,7 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
   let par2PhFB = "";
   let repeating;
   let constraintType;
+  let otherLabel;
 
   if (args2nd.length > 0) {
     let counter = 0;
@@ -1923,7 +1927,7 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
                 violations++;
 
                 if (par1PhFB === "") {
-                  if (startNum1st === endNum1st) {
+                  if (startNum1st === endNum1st && !["phase", "sub-phase"].includes(arg1st.type)) {
                     par1PhFB = "You should have ";
                     par1PhFB = addToListOfFeedback(par1PhFB, last, label1st, false);
                   } //feedback for phase
@@ -1933,7 +1937,7 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
                   }
                 }
 
-                if (startNum2nd === endNum2nd) {
+                if (startNum2nd === endNum2nd && !["phase", "sub-phase"].includes(arg2nd.type)) {
                   if (par2PhFB === "") {
                     par2PhFB = par2PhFB + " before you did ";
                   } //feedback for item
@@ -1963,6 +1967,7 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
 
                 storeMisOrderedArgs(startNum1st, arg2nd, phases, phaseNames, checklistHierarchy);
                 constraintType = saveFailedConstraint(arg1st, arg2nd, constraintID, constraintsViolated);
+                otherLabel = arg2nd.label;
               } else {
                 if (op === "or") {
                   return;
@@ -1979,7 +1984,7 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
                 //if failed constraint  i.e. arg2 is late
                 violations++;
 
-                if (startNum1st === endNum1st) {
+                if (startNum1st === endNum1st && !["phase", "sub-phase"].includes(arg1st.type)) {
                   //feedback for item
                   if (par1PhFB === "") {
                     par1PhFB = "You should have ";
@@ -1995,7 +2000,7 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
                 } //feedback for phase
                 else {
                   if (par1PhFB === "") {
-                    par1PhFB = "You should have completed ";
+                    par1PhFB = "You should have completed the ";
                   }
 
                   if (violations > 1) {
@@ -2008,19 +2013,20 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
                 }
 
                 if (par2PhFB === "") {
-                  if (startNum2nd === endNum2nd) {
-                    par2PhFB = par2PhFB + " before you did ";
+                  if (startNum2nd === endNum2nd && !["phase", "sub-phase"].includes(arg2nd.type)) {
+                    par2PhFB = par2PhFB + " before you did "; //feedback for nonphase
+
                     par2PhFB = addToListOfFeedback(par2PhFB, last, label1st, false);
                   } else {
-                    par2PhFB = par2PhFB + " before starting "; //feedback for nonphase
+                    par2PhFB = par2PhFB + " before starting the "; //feedback for phase
 
                     par2PhFB = addToListOfFeedback(par2PhFB, last, label1st, false);
                   }
                 }
 
-                storeMisOrderedArgs(startNum2nd, arg1st, phases, phaseNames, checklistHierarchy); //feedback for phase
-
+                storeMisOrderedArgs(startNum2nd, arg1st, phases, phaseNames, checklistHierarchy);
                 constraintType = saveFailedConstraint(arg2nd, arg1st, constraintID);
+                otherLabel = arg1st.label;
               } else {
                 if (op === "or") {
                   return;
@@ -2040,7 +2046,7 @@ const checkAgainst2ndArgs = (arg1st, args2nd, op, direction, constraintID, entry
 
     if (phFB !== "") {
       phFB = phFB + ".";
-      storeMisOrderedFB(startNum1st, label1st, phFB, constraintType, phases, phaseNames, checklistHierarchy, phaseFB);
+      storeMisOrderedFB(startNum1st, label1st, otherLabel, phFB, constraintType, phases, phaseNames, checklistHierarchy, phaseFB);
     }
   }
 };
@@ -2053,7 +2059,7 @@ const checkConstraintsForArg = (arg1st, constraint, phases, phaseNames, entryNam
   op = constraint.afterOp;
   checkAgainst2ndArgs(arg1st, args2nd, op, "after", constraint.id, entryNames, entries, phases, phaseNames, checklistHierarchy, itemByID, itemByLabel, constraintsViolated, phaseFB);
 }; //end support functions for constraint checking
-//To DO: filter constraints in/out based on findings available for this scenario
+//To DO Future: filter constraints in/out based on findings available for this scenario
 //main function for constraint checking
 
 
@@ -2449,8 +2455,10 @@ const getPhaseFeedback = (entry, phaseFBGiven, c2FB) => {
 
       fb = c2FB[indexLabel];
 
-      if (fb && fb.feedbackOutOfOrder) {
+      if (fb && fb.feedbackOutOfOrder && fb.feedbackOutOfOrder !== "") {
         result = fb.feedbackOutOfOrder;
+      } else {
+        result = entry.phFeedback;
       }
     } else {
       result = entry.phFeedback;
@@ -3305,7 +3313,8 @@ const organizeLogDisplay = (phaseNames, phases, requiredPhaseNames, problemState
 
       if (!!phaseFB[subheader.label]) {
         subheader.phaseOrderStatus = "misOrdered";
-        subheader.phFeedback = phaseFB[subheader.label];
+        subheader.phFeedback = phaseFB[subheader.label].feedback;
+        subheader.lateRelativeTo = phaseFB[subheader.label].arg2;
       }
 
       let highLevelPhase = subPhases[localPhaseName];
@@ -3335,7 +3344,8 @@ const organizeLogDisplay = (phaseNames, phases, requiredPhaseNames, problemState
 
           if (!!phaseFB[header.label]) {
             header.phaseOrderStatus = "misOrdered";
-            header.phFeedback = phaseFB[header.label];
+            header.phFeedback = phaseFB[header.label].feedback;
+            header.lateRelativeTo = phaseFB[header.label].arg2;
           }
 
           displayObjects.push(header);
@@ -3373,7 +3383,8 @@ const organizeLogDisplay = (phaseNames, phases, requiredPhaseNames, problemState
 
           if (!!phaseFB[header.label]) {
             header.phaseOrderStatus = "misOrdered";
-            header.phFeedback = phaseFB[header.label];
+            header.phFeedback = phaseFB[header.label].feedback;
+            header.lateRelativeTo = phaseFB[header.label].arg2;
           }
 
           phaseStatuses = [];
@@ -3511,7 +3522,7 @@ __webpack_require__.r(__webpack_exports__);
 
  // constants
 
-const summaryFields = ["label", "status", "phaseOrderStatus", "phase", "subPhase", "labelID", "phaseID", "probLabel", "answerCorrect", "answerDetails", "timestamp", "type"]; // globals
+const summaryFields = ["label", "status", "phaseOrderStatus", "lateRelativeTo", "phase", "subPhase", "labelID", "phaseID", "probLabel", "answerCorrect", "answerDetails", "timestamp", "type"]; // globals
 
 let analysis; // helper functions
 //regularize status values, by examining status values grouped into categories
@@ -3651,6 +3662,10 @@ function processNextLevel(summary, top, decisionPromptIDs) {
     if (!!event && !!event.phaseOrderStatus) {
       headerStatus = event.phaseOrderStatus;
       header.phaseOrderStatus = headerStatus;
+
+      if (!!event.lateRelativeTo && event.lateRelativeTo.length >= 1) {
+        header.lateRelativeTo = event.lateRelativeTo;
+      }
     }
 
     top.subActions.forEach(action => {
@@ -4038,40 +4053,134 @@ function DisplayContent({
     }, this);
   };
 
+  const getSectionHeader = (label, main, feedback) => {
+    if (main) {
+      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
+        children: [feedback && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
+          colSpan: "3",
+          className: "text-danger",
+          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
+            className: "material-icons-outlined",
+            children: "alarm "
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 93,
+            columnNumber: 15
+          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("font", {
+            size: "+1",
+            children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("b", {
+              children: label
+            }, void 0, false, {
+              fileName: _jsxFileName,
+              lineNumber: 94,
+              columnNumber: 31
+            }, this)
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 94,
+            columnNumber: 15
+          }, this)]
+        }, void 0, true, {
+          fileName: _jsxFileName,
+          lineNumber: 92,
+          columnNumber: 13
+        }, this), !feedback && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
+          colSpan: "3",
+          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("font", {
+            size: "+1",
+            children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("b", {
+              children: label
+            }, void 0, false, {
+              fileName: _jsxFileName,
+              lineNumber: 97,
+              columnNumber: 33
+            }, this)
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 97,
+            columnNumber: 17
+          }, this)
+        }, void 0, false, {
+          fileName: _jsxFileName,
+          lineNumber: 96,
+          columnNumber: 13
+        }, this)]
+      }, void 0, true);
+    } else {
+      return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
+        children: [feedback && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
+          colSpan: "3",
+          className: "text-danger",
+          children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
+            className: "material-icons-outlined",
+            children: "alarm"
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 105,
+            columnNumber: 17
+          }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("b", {
+            children: label
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 106,
+            columnNumber: 17
+          }, this)]
+        }, void 0, true, {
+          fileName: _jsxFileName,
+          lineNumber: 104,
+          columnNumber: 13
+        }, this), !feedback && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
+          colSpan: "3",
+          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("b", {
+            children: label
+          }, void 0, false, {
+            fileName: _jsxFileName,
+            lineNumber: 110,
+            columnNumber: 17
+          }, this)
+        }, void 0, false, {
+          fileName: _jsxFileName,
+          lineNumber: 109,
+          columnNumber: 13
+        }, this)]
+      }, void 0, true);
+    }
+  };
+
   let phaseFBGiven = [];
 
   const dispHeaderRow = (entry, index) => {
     let phaseFB = "";
     let result;
+    let label;
+    let main = false;
+    let feedback = false;
 
-    if (entry.id === "assessmentHeader") {
+    if (entry.id === "assessmentHeader" || entry.id === "assessmentSubHeader") {
       result = (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_8__.getPhaseFeedback)(entry, phaseFBGiven, c2FB);
       phaseFB = result[0];
       phaseFBGiven = result[1];
+      label = entry.label;
+
+      if (phaseFB !== "") {
+        phaseFB = "<i>Mistimed action(s).</i> " + phaseFB;
+        feedback = true;
+      }
     }
 
     if (entry.id === "assessmentHeader") {
+      label = label.toUpperCase();
+      main = true;
+    }
+
+    if (entry.id === "assessmentHeader" || entry.id === "assessmentSubHeader") {
       //|| entry.id === "assessmentSubHeader") 
       return /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
-          colSpan: "3",
-          className: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_8__.getColor)(entry, fbTemplates),
-          children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("b", {
-            children: entry.label
-          }, void 0, false, {
-            fileName: _jsxFileName,
-            lineNumber: 103,
-            columnNumber: 25
-          }, this)
-        }, void 0, false, {
-          fileName: _jsxFileName,
-          lineNumber: 102,
-          columnNumber: 21
-        }, this), training && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)(Feedback, {
+        children: ["  ", getSectionHeader(label, main, feedback), training && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)(Feedback, {
           value: phaseFB
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 105,
+          lineNumber: 143,
           columnNumber: 34
         }, this), training && showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
           children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("textarea", {
@@ -4082,12 +4191,12 @@ function DisplayContent({
             id: `${entry.id}`
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 108,
+            lineNumber: 146,
             columnNumber: 25
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 107,
+          lineNumber: 145,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4097,7 +4206,7 @@ function DisplayContent({
         className: "black"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 121,
+        lineNumber: 159,
         columnNumber: 17
       }, this);
     }
@@ -4129,7 +4238,7 @@ function DisplayContent({
           children: "Requested vital:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 153,
+          lineNumber: 191,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
           className: "text-muted",
@@ -4138,23 +4247,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 154,
+              lineNumber: 192,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 154,
+              lineNumber: 192,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 154,
+            lineNumber: 192,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 154,
+          lineNumber: 192,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4166,7 +4275,7 @@ function DisplayContent({
           children: "Requested assessment:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 161,
+          lineNumber: 199,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
           className: "text-muted",
@@ -4175,23 +4284,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 162,
+              lineNumber: 200,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 162,
+              lineNumber: 200,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 162,
+            lineNumber: 200,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 162,
+          lineNumber: 200,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4205,7 +4314,7 @@ function DisplayContent({
           children: "Requested circulation's:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 171,
+          lineNumber: 209,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
           className: "text-muted",
@@ -4214,23 +4323,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 172,
+              lineNumber: 210,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 172,
+              lineNumber: 210,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 172,
+            lineNumber: 210,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 172,
+          lineNumber: 210,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4242,7 +4351,7 @@ function DisplayContent({
           children: ["Requested ", entry.vitalType, "'s:"]
         }, void 0, true, {
           fileName: _jsxFileName,
-          lineNumber: 179,
+          lineNumber: 217,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
           className: "text-muted",
@@ -4251,23 +4360,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 180,
+              lineNumber: 218,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 180,
+              lineNumber: 218,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 180,
+            lineNumber: 218,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 180,
+          lineNumber: 218,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4279,7 +4388,7 @@ function DisplayContent({
           children: "Requested status for:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 187,
+          lineNumber: 225,
           columnNumber: 21
         }, this), " ", getIntvLabel(entry), ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
           className: "text-muted",
@@ -4288,23 +4397,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 188,
+              lineNumber: 226,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 188,
+              lineNumber: 226,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 188,
+            lineNumber: 226,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 188,
+          lineNumber: 226,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4316,7 +4425,7 @@ function DisplayContent({
           children: "Requested SAMPLE:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 195,
+          lineNumber: 233,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
           className: "text-muted",
@@ -4325,23 +4434,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 196,
+              lineNumber: 234,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 196,
+              lineNumber: 234,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 196,
+            lineNumber: 234,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 196,
+          lineNumber: 234,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4353,7 +4462,7 @@ function DisplayContent({
           children: "Requested OPQRST:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 203,
+          lineNumber: 241,
           columnNumber: 21
         }, this), " ", entry.vital, ",", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {
           className: "text-muted",
@@ -4362,23 +4471,23 @@ function DisplayContent({
               children: "Found:"
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 204,
+              lineNumber: 242,
               columnNumber: 53
             }, this), "\xA0", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
               children: entry.value
             }, void 0, false, {
               fileName: _jsxFileName,
-              lineNumber: 204,
+              lineNumber: 242,
               columnNumber: 72
             }, this)]
           }, void 0, true, {
             fileName: _jsxFileName,
-            lineNumber: 204,
+            lineNumber: 242,
             columnNumber: 50
           }, this)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 204,
+          lineNumber: 242,
           columnNumber: 21
         }, this)]
       }, void 0, true);
@@ -4404,27 +4513,27 @@ function DisplayContent({
           children: "Found:"
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 226,
+          lineNumber: 264,
           columnNumber: 47
         }, this), " ", /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("i", {
           children: entry.finding
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 226,
+          lineNumber: 264,
           columnNumber: 61
         }, this)]
       }, void 0, true, {
         fileName: _jsxFileName,
-        lineNumber: 226,
+        lineNumber: 264,
         columnNumber: 44
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 226,
+      lineNumber: 264,
       columnNumber: 15
     }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {}, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 227,
+      lineNumber: 265,
       columnNumber: 15
     }, this);
   }
@@ -4435,11 +4544,11 @@ function DisplayContent({
       children: formatAnswerGiven(entry)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 232,
+      lineNumber: 270,
       columnNumber: 14
     }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("span", {}, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 233,
+      lineNumber: 271,
       columnNumber: 14
     }, this);
   }
@@ -4471,13 +4580,13 @@ function DisplayContent({
         children: entry.numericalID
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 264,
+        lineNumber: 302,
         columnNumber: 17
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
         children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_8__.getTimestamp)(entry)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 265,
+        lineNumber: 303,
         columnNumber: 17
       }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
         className: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_8__.getColor)(entry, fbTemplates),
@@ -4486,24 +4595,24 @@ function DisplayContent({
           children: (0,_meddbriefer_analysis__WEBPACK_IMPORTED_MODULE_8__.getAssessmentIcon)(entry, fbTemplates)
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 267,
+          lineNumber: 305,
           columnNumber: 21
         }, this), getLabel(entry)]
       }, void 0, true, {
         fileName: _jsxFileName,
-        lineNumber: 266,
+        lineNumber: 304,
         columnNumber: 17
       }, this), training && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
         children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)(Feedback, {
           value: feedback
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 270,
+          lineNumber: 308,
           columnNumber: 34
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 270,
+        lineNumber: 308,
         columnNumber: 30
       }, this), training && showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("td", {
         children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("textarea", {
@@ -4514,12 +4623,12 @@ function DisplayContent({
           id: `${entry.id}`
         }, void 0, false, {
           fileName: _jsxFileName,
-          lineNumber: 274,
+          lineNumber: 312,
           columnNumber: 25
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 273,
+        lineNumber: 311,
         columnNumber: 21
       }, this)]
     }, void 0, true);
@@ -4554,7 +4663,7 @@ function DisplayContent({
       children: next === null ? "Save" : "Done"
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 310,
+      lineNumber: 348,
       columnNumber: 9
     }, this);
   }
@@ -4583,7 +4692,7 @@ function DisplayContent({
       children: "processing"
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 342,
+      lineNumber: 380,
       columnNumber: 17
     }, this);
   }
@@ -4598,19 +4707,19 @@ function DisplayContent({
         children: "Toggle Comments"
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 352,
+        lineNumber: 390,
         columnNumber: 29
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 348,
+      lineNumber: 386,
       columnNumber: 19
     }, this) : /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)(_meddbriefer_mdb_ui__WEBPACK_IMPORTED_MODULE_9__.MDBNavBar, {
       title: getNavBarTitle(),
       leftNav: getLeftNavButton()
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 360,
+      lineNumber: 398,
       columnNumber: 19
     }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("form", {
       children: /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("div", {
@@ -4628,45 +4737,45 @@ function DisplayContent({
                 children: " ID "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 370,
+                lineNumber: 408,
                 columnNumber: 29
               }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Timestamp "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 371,
+                lineNumber: 409,
                 columnNumber: 29
               }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Action Description "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 372,
+                lineNumber: 410,
                 columnNumber: 29
               }, this), training && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Feedback "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 373,
+                lineNumber: 411,
                 columnNumber: 42
               }, this), training && showCommentColumn && /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("th", {
                 className: "table-header",
                 children: " Comments "
               }, void 0, false, {
                 fileName: _jsxFileName,
-                lineNumber: 374,
+                lineNumber: 412,
                 columnNumber: 63
               }, this)]
             }, void 0, true, {
               fileName: _jsxFileName,
-              lineNumber: 369,
+              lineNumber: 407,
               columnNumber: 25
             }, this)
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 368,
+            lineNumber: 406,
             columnNumber: 21
           }, this), /*#__PURE__*/(0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_10__.jsxDEV)("tbody", {
             className: "scroll",
@@ -4674,27 +4783,27 @@ function DisplayContent({
               children: currentEntry.type === "header" ? dispHeaderRow(currentEntry, index) : dispDataRow(currentEntry, index)
             }, index, false, {
               fileName: _jsxFileName,
-              lineNumber: 379,
+              lineNumber: 417,
               columnNumber: 29
             }, this))
           }, void 0, false, {
             fileName: _jsxFileName,
-            lineNumber: 377,
+            lineNumber: 415,
             columnNumber: 21
           }, this)]
         }, void 0, true, {
           fileName: _jsxFileName,
-          lineNumber: 367,
+          lineNumber: 405,
           columnNumber: 17
         }, this)
       }, void 0, false, {
         fileName: _jsxFileName,
-        lineNumber: 365,
+        lineNumber: 403,
         columnNumber: 19
       }, this)
     }, void 0, false, {
       fileName: _jsxFileName,
-      lineNumber: 365,
+      lineNumber: 403,
       columnNumber: 13
     }, this)]
   }, void 0, true);
@@ -6864,7 +6973,9 @@ const B4CA_PhaseDEBRF = [{
 }, {
   step: "R",
   slides: [{
-    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a man dressed in motocross gear lying on the ground. Your initial assessment reveals a helmeted patient who is awake and alert with shallow breaths.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You immediately direct your partner to provide"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("manual c-spine stabilization", "Spinal precautions should be taken with any patient involved in a motor-vehicle accident or any instance where a patient was thrown."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("while removing the helmet and apply a cervical collar. You note the patient has an open airway and that his breathing is rapid and shallow, so you place him on either a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("non-rebreather mask or nasal cannula.", "While this patient is in mild respiratory distress and has hypoxia, his mental status and respiratory effort are appropriate, so he does not need assistance with ventilation."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("His extremity pulses are strong.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You instruct another responder to obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from the race official while you perform a rapid head-to-toe assessment. You note that the patient has diminished breath sounds on the left but"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("no signs of decreased cardiac output.", "This patient has a pneumothorax, as evidenced by his hypoxia and unequal breath sounds, but without evidence of decreased cardiac output (ex. JVD, hypotension), he does not have a tension pneumothorax and does not require needle decompression at this time."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("After checking the patient’s anterior, you and your partner log roll the patient, check his posterior, and secure him onto a long back board.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("Once the CID is in place, you and your partners then place the patient on a stretcher, cover him with a blanket, and transfer him to the ambulance. You notify the Level I trauma center you are on the way. En route, you establish two large bore IVs, reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "Critically ill patients should be reassessed every 5 minutes."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a man dressed in motocross gear lying on the ground. Your initial assessment reveals a helmeted patient who is awake and alert with shallow breaths.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You immediately direct your partner to provide"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("manual c-spine stabilization", "Spinal precautions should be taken with any patient involved in a motor-vehicle accident or any instance where a patient was thrown."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("while removing the helmet and apply a cervical collar. You note the patient has an open airway and that his breathing is rapid and shallow, so you place him on either a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("non-rebreather mask or nasal cannula.", "While this patient is in mild respiratory distress and has hypoxia, his mental status and respiratory effort are appropriate, so he does not need assistance with ventilation."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("His extremity pulses are strong."))]
+  }, {
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You instruct another responder to obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from the race official while you perform a rapid head-to-toe assessment. You note that the patient has diminished breath sounds on the left but"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("no signs of decreased cardiac output.", "This patient has a pneumothorax, as evidenced by his hypoxia and unequal breath sounds, but without evidence of decreased cardiac output (ex. JVD, hypotension), he does not have a tension pneumothorax and does not require needle decompression at this time."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("After checking the patient’s anterior, you and your partner log roll the patient, check his posterior, and secure him onto a long back board.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("Once the CID is in place, you and your partners then place the patient on a stretcher, cover him with a blanket, and transfer him to the ambulance. You notify the Level I trauma center you are on the way. En route, you establish two large bore IVs, reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "Critically ill patients should be reassessed every 5 minutes."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
   }]
 }, {
   step: "F",
@@ -8928,7 +9039,9 @@ const B5CA_PhaseDEBRF = [{
 }, {
   step: "R",
   slides: [{
-    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a patient leaning against the bar. Your initial assessment reveals a patient who is awake but responds only to verbal requests and is holding his hand over a bloody chest wound.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You immediately direct your partner to provide"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("manual c-spine stabilization", "Though there is no apparent spine trauma, given that you do not know the full extent of what happened in the fight, it is safest to assume spinal precautions at the beginning of your assessment."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and apply a cervical collar. You note the patient’s airway is patent but his breathing is rapid and shallow so you place him on a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("non-rebreather mask.", "Though you might consider using a bag-valve mask to assist with ventilation in this patient, the patient has a penetrating chest wound and could have a tension pneumothorax, so positive-pressure ventilation should be avoided if possible."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("His extremity pulses are weak and his skin is pale and diaphoretic.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You instruct another responder to obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from a bystander while you perform a rapid head-to-toe assessment. As you examine the patient you note diminished breath sounds on the right and a stab wound to the right chest. Combined with his significant hypotension, you suspect the patient has a right tension pneumothorax. You perform"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("needle decompression of the right lung,", "A large bore needle (at least 14 or 16 gauge) should be inserted in the R chest at the 2nd or 3rd intercostal space at the mid-clavicular line OR fourth of fifth intercostal space at the mid-axillary line to decompress the tension pneumothorax that is causing the patient’s respiratory distress and obstructive shock."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("the success of which you confirm with a repeat lung exam and note an improvement in the patient’s vital signs. Additionally, you place an"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("occlusive dressing", "This patient has a penetrating chest wound that, if untreated, will continue to allow air to collect around the lungs, worsening his tension pneumothorax. Be sure to only tape 3 sides to prevent air from entering the lungs while still allowing blood and air to escape."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("over the initial penetrating chest wound to prevent re-accumulation of air. After completing your secondary survey, you then"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("use a scoop stretcher", "While a cervical collar is appropriate when you approach this trauma patient, further spinal immobilization is contraindicated in this patient with a penetrating chest wound, as immobilization on a spine board may cause further injury."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("to transfer him to the ambulance.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("While en route, you and your partner cover the patient with a blanket and notify the level II trauma center of the patient’s condition and give an ETA. You establish two large bore IVs, administer fluids only as needed to"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("maintain systolic BP >90,", "Initially this patient’s BP is 58/palp, which is due to obstruction shock secondary to his tension pneumothorax. With appropriate management of the tension pneumothorax and resumption of normal cardiac output, you should see an improvement in the patient’s blood pressure without need for significant fluid resuscitation."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "This critically ill patient should be reassessed every 5 minutes"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a patient leaning against the bar. Your initial assessment reveals a patient who is awake but responds only to verbal requests and is holding his hand over a bloody chest wound.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You immediately direct your partner to provide"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("manual c-spine stabilization", "Though there is no apparent spine trauma, given that you do not know the full extent of what happened in the fight, it is safest to assume spinal precautions at the beginning of your assessment."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and apply a cervical collar. You note the patient’s airway is patent but his breathing is rapid and shallow so you place him on a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("non-rebreather mask.", "Though you might consider using a bag-valve mask to assist with ventilation in this patient, the patient has a penetrating chest wound and could have a tension pneumothorax, so positive-pressure ventilation should be avoided if possible."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("His extremity pulses are weak and his skin is pale and diaphoretic."))]
+  }, {
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You instruct another responder to obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from a bystander while you perform a rapid head-to-toe assessment. As you examine the patient you note diminished breath sounds on the right and a stab wound to the right chest. Combined with his significant hypotension, you suspect the patient has a right tension pneumothorax. You perform"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("needle decompression of the right lung,", "A large bore needle (at least 14 or 16 gauge) should be inserted in the R chest at the 2nd or 3rd intercostal space at the mid-clavicular line OR fourth of fifth intercostal space at the mid-axillary line to decompress the tension pneumothorax that is causing the patient’s respiratory distress and obstructive shock."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("the success of which you confirm with a repeat lung exam and note an improvement in the patient’s vital signs. Additionally, you place an"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("occlusive dressing", "This patient has a penetrating chest wound that, if untreated, will continue to allow air to collect around the lungs, worsening his tension pneumothorax. Be sure to only tape 3 sides to prevent air from entering the lungs while still allowing blood and air to escape."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("over the initial penetrating chest wound to prevent re-accumulation of air. After completing your secondary survey, you then"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("use a scoop stretcher", "While a cervical collar is appropriate when you approach this trauma patient, further spinal immobilization is contraindicated in this patient with a penetrating chest wound, as immobilization on a spine board may cause further injury."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("to transfer him to the ambulance.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("While en route, you and your partner cover the patient with a blanket and notify the level II trauma center of the patient’s condition and give an ETA. You establish two large bore IVs, administer fluids only as needed to"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("maintain systolic BP >90,", "Initially this patient’s BP is 58/palp, which is due to obstruction shock secondary to his tension pneumothorax. With appropriate management of the tension pneumothorax and resumption of normal cardiac output, you should see an improvement in the patient’s blood pressure without need for significant fluid resuscitation."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "This critically ill patient should be reassessed every 5 minutes"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
   }]
 }, {
   step: "F",
@@ -9177,8 +9290,7 @@ const B5CA_PhaseIE = {
         feedbackErrors: [""],
         examineIfAbsent: true,
         examineIfErrors: false,
-        promptsIfAbsent: "",
-        promptsIfErrors: "",
+        promptsIfAbsent: "Did not consider risk for cervical spine injury; considered cervical spine injury but did not think the mechanism necessitated spinal stabilization",
         promptsIfErrors: "",
         subActionsList: true,
         subActions: [{
@@ -9596,7 +9708,7 @@ const B5CA_PhaseIE = {
           label: "identify that this patient has a tension pneumothorax and perform pleural decompression appropriately by inserting a large bore needle between ribs 2 and 3 mid-clavicular or between ribs 5 and 6 midaxillary on the right side of the chest",
           type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
           feedbackAbsent: ["This patient had absent breath sounds after being stabbed with a knife to the chest. Your differential diagnosis includes pneumothorax or hemothorax. The patient also has signs of diminished cardiac output, including his hypotension and poor perfusion (pale, diaphoretic skin, and weak distal pulses) suggest that he may have a tension pneumothorax, which necessitates needle decompression. Other signs of a tension pneumothorax, which this patient did not have, include JVD or tracheal deviation."],
-          feedbackOutOfOrder: [""],
+          feedbackOutOfOrder: ["Tension pneumothorax is an injury that affects breathing.  It is a potentially life threatening condition that requires prompt intervention. For these reasons, it should be addressed during the primary survey."],
           feedbackErrors: ["Once you have identified a tension pneumothorax, decompression is the appropriate next step. You should use a large-bore needle (ideally 14 or 16 gauge and at least 2 inches in length) and insert it into either:", "- the 2nd or 3rd intercostal space at the mid-clavicular line", "- the 4th or 5th intercostal space at the mid-axillary line", "Remember to insert the needle above the rib, not below, because there is a neurovascular bundle that runs below each rib you want to avoid damaging."],
           examineIfAbsent: true,
           examineIfErrors: false,
@@ -9609,7 +9721,7 @@ const B5CA_PhaseIE = {
           label: "Apply an occlusive dressing over the stab wound to prevent air from getting into the chest",
           type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
           feedbackAbsent: ["An open chest wound, such as one caused by a stab-wound after the object has been pulled out, may lead to a worsening tension pneumothorax. As the patient inhales, creating negative intrathoracic pressure, air may be sucked in through the wound and collect in the intrapleural cavity. An occlusive dressing, taped on 3 sides to allow air to escape, will protect against this."],
-          feedbackOutOfOrder: [""],
+          feedbackOutOfOrder: ["Tension pneumothorax is an injury that affects breathing.  It is a potentially life threatening condition that requires prompt intervention. For these reasons, it should be addressed during the primary survey."],
           feedbackErrors: [""],
           examineIfAbsent: true,
           examineIfErrors: false,
@@ -10567,13 +10679,15 @@ const B5CA_PhaseIE = {
         examineIfErrors: false,
         promptsIfAbsent: "",
         promptsIfErrors: "",
-        subActionsList: true,
+        subActionsList: false,
         subActions: [{
           id: "inspects-posterior-other-injury",
+          label: "injury",
           feedbackAbsent: [""],
           subActions: []
         }, {
           id: "inspects-posterior-step-offs",
+          labe: "step-offs",
           feedbackAbsent: ["A palpable step-off, which the patient did not have, would suggest a fracture."],
           subActions: []
         }]
@@ -11171,7 +11285,9 @@ const C5CA_PhaseDEBRF = [{
 }, {
   step: "R",
   slides: [{
-    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a young man lying on the ground in a parking lot surrounded by police officers and bystanders. Your initial assessment reveals a conscious but lethargic patient who has significant bleeding from a gunshot wound to his left upper anterior mid-thigh despite a bystander holding pressure.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You immediately direct your partner to provide manual c-spine stabilization, while you"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("apply a tourniquet", "The patient is hemorrhaging from his upper leg, which is an immediate life threat and should be addressed before progressing on with your exam, including before assessing the patient’s ABCs "), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("to the patient’s left upper leg, proximal to the injury, and confirm that this has stopped the bleeding.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("Next, you find the patient’s airway to be patent but his breathing is rapid and shallow so you assist his ventilations with a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("bag valve mask", "This patient was not adequately ventilating (rapid, shallow breaths) so O2 delivered via nasal canula or non-rebreather mask alone would not have been adequate."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and turn the O2 up to 15L. His extremity pulses are absent and skin is pale and diaphoretic. You instruct another responder to obtain a set of baseline vitals and obtain a SAMPLE history from a bystander while you perform a rapid head-to-toe assessment.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You and your partners then place the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("on a scoop stretcher,", "Spinal immobilization is contraindicated in this patient with a penetrating abdominal wound; immobilization on a spine board may cause further injury."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("cover him with a blanket, and transfer him to the ambulance. Worried for"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("hemorrhagic shock,", "This GSW victim with a known source of significant bleeding is hypotensive, most likely from hemorrhagic shock, which should be managed with rapid fluid resuscitation, keeping the patient supine, administering O2, and keeping the patient warm"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("you place two large-bore IVs en route and start fluid resuscitation to a goal systolic BP >90.  You notify the Level 2 trauma center you are on the way, reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "Critically ill patients should be reassessed every 5 minutes"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a young man lying on the ground in a parking lot surrounded by police officers and bystanders. Your initial assessment reveals a conscious but lethargic patient who has significant bleeding from a gunshot wound to his left upper anterior mid-thigh despite a bystander holding pressure.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You immediately direct your partner to provide manual c-spine stabilization, while you"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("apply a tourniquet", "The patient is hemorrhaging from his upper leg, which is an immediate life threat and should be addressed before progressing on with your exam, including before assessing the patient’s ABCs "), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("to the patient’s left upper leg, proximal to the injury, and confirm that this has stopped the bleeding."))]
+  }, {
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("Next, you find the patient’s airway to be patent but his breathing is rapid and shallow so you assist his ventilations with a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("bag valve mask", "This patient was not adequately ventilating (rapid, shallow breaths) so O2 delivered via nasal canula or non-rebreather mask alone would not have been adequate."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and turn the O2 up to 15L. His extremity pulses are absent and skin is pale and diaphoretic. You instruct another responder to obtain a set of baseline vitals and obtain a SAMPLE history from a bystander while you perform a rapid head-to-toe assessment.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You and your partners then place the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("on a scoop stretcher,", "Spinal immobilization is contraindicated in this patient with a penetrating abdominal wound; immobilization on a spine board may cause further injury."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("cover him with a blanket, and transfer him to the ambulance. Worried for"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("hemorrhagic shock,", "This GSW victim with a known source of significant bleeding is hypotensive, most likely from hemorrhagic shock, which should be managed with rapid fluid resuscitation, keeping the patient supine, administering O2, and keeping the patient warm"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("you place two large-bore IVs en route and start fluid resuscitation to a goal systolic BP >90.  You notify the Level 2 trauma center you are on the way, reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "Critically ill patients should be reassessed every 5 minutes"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
   }]
 }, {
   step: "F",
@@ -12234,6 +12350,21 @@ const C5CA_PhaseIE = {
           subActionsList: false,
           subActions: []
         }]
+      }, {
+        id: "intv-spinal-immobilization-technique-cervical-collar",
+
+        /* unnecessary intervention */
+        label: "Apply an appropriately sized cervical collar",
+        type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.UNNEC,
+        feedbackAbsent: [""],
+        feedbackOutOfOrder: [""],
+        feedbackErrors: ["This patient has no evidence of neck injury. Placing a collar and/or CID will make your examination more difficult and should only be done if you suspect an injury to the neck, whether by history or exam."],
+        examineIfAbsent: false,
+        examineIfErrors: false,
+        promptsIfAbsent: "",
+        promptsIfErrors: "",
+        subActionsList: false,
+        subActions: []
       }]
     }, {
       id: "history-taking",
@@ -13262,13 +13393,9 @@ const SC8CP_PhaseDEBRF = [{
 }, {
   step: "R",
   slides: [{
-    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a 4-year-old boy lying supine beside a pool in the backyard of a suburban house. Other EMS responders have arrived on site to assist you.  Your initial assessment reveals that the boy is unconscious and cyanotic.  A quick pulse check shows that it is slow and weak. Given that the patient is in"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("critical condition,", "This patient is unresponsive and is therefore considered a critical patient."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("you direct a responder to call for air transport to the"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("nearest pediatric trauma center.", "Because this patient is under 14 years of age, he should be transported to the nearest level 1 or 2 pediatric trauma center that is less than 45 minutes away."))]
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("In an idealized scenario, you arrive on scene and find a 4-year-old boy lying supine beside a pool in the backyard of a suburban house. Other EMS responders have arrived on site to assist you.  Your initial assessment reveals that the boy is unconscious and cyanotic.  A quick pulse check shows that it is slow and weak. Given that the patient is in"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("critical condition,", "This patient is unresponsive and is therefore considered a critical patient."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("you direct a responder to call for air transport to the"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("nearest pediatric trauma center.", "Because this patient is under 14 years of age, he should be transported to the nearest level 1 or 2 pediatric trauma center that is less than 45 minutes away.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You direct another partner to take"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("manual c-spine precautions", "Any near-drowning or drowning, especially if unwitnessed, should be considered a risk for possible cervical and spinal injury as the patient may have been involved in a diving accident."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and apply a cervical collar. You open the patient’s airway, using a jaw thrust maneuver.  Finding a substantial amount of water and vomit in the boy’s mouth, you apply suction. After the patient’s airway is cleared, you assess breathing and find it to be slow with gurgling sounds. You direct your partner to insert an OPA and ventilate the patient with 100% oxygen delivered through a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("bag-valve mask", "This patient was not adequately ventilating (slow, gurgling breaths) or oxygenating (low SpO2) so O2 delivered via nasal cannula or non-rebreather mask would not have been adequate."))]
   }, {
-    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You direct another partner to take"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("manual c-spine precautions", "Any near-drowning or drowning, especially if unwitnessed, should be considered a risk for possible cervical and spinal injury as the patient may have been involved in a diving accident."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and apply a cervical collar. You open the patient’s airway, using a jaw thrust maneuver.  Finding a substantial amount of water and vomit in the boy’s mouth, you apply suction. After the patient’s airway is cleared, you assess breathing and find it to be slow with gurgling sounds. You direct your partner to insert an OPA and ventilate the patient with 100% oxygen delivered through a"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("bag-valve mask", "This patient was not adequately ventilating (slow, gurgling breaths) or oxygenating (low SpO2) so O2 delivered via nasal cannula or non-rebreather mask would not have been adequate."))]
-  }, {
-    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You then"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("intubate the patient", "The patient was unresponsive with a GCS of 3 so should be intubated to safely get the patient to the pediatric trauma center (remember, generally with a GCS <8, you should intubate)."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and direct your partner to resume BVM ventilation all while maintaining c-spine precautions. You have another responder obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from the babysitter while you perform a rapid head-to-toe assessment.  On completion of your secondary survey, you secure him onto a long back board."))]
-  }, {
-    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You and your partners then place the patient on a stretcher and transfer him to the helicopter as soon as it arrives.  You cover him with blankets and ask the pilot to turn up the heat. While en route to the pediatric trauma center, you contact the facility to alert them to the patient’s condition and your ETA.  You establish two large bore IVs, reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "Critically ill patients should be reassessed every 5 minutes."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
+    paragraphs: [(0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You then"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("intubate the patient", "The patient was unresponsive with a GCS of 3 so should be intubated to safely get the patient to the pediatric trauma center (remember, generally with a GCS <8, you should intubate)."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and direct your partner to resume BVM ventilation all while maintaining c-spine precautions. You have another responder obtain a set of baseline vitals and obtain a SAMPLE and OPQRST history from the babysitter while you perform a rapid head-to-toe assessment.  On completion of your secondary survey, you secure him onto a long back board.")), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.para)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("You and your partners then place the patient on a stretcher and transfer him to the helicopter as soon as it arrives.  You cover him with blankets and ask the pilot to turn up the heat. While en route to the pediatric trauma center, you contact the facility to alert them to the patient’s condition and your ETA.  You establish two large bore IVs, reassess the patient"), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.link)("every five minutes,", "Critically ill patients should be reassessed every 5 minutes."), (0,_utils__WEBPACK_IMPORTED_MODULE_0__.text)("and confirm that all interventions are working properly, modifying any as necessary."))]
   }]
 }, {
   step: "F",
@@ -13514,7 +13641,7 @@ const SC8CP_PhaseIE = {
         label: "follow a 'CAB' protocol, given that this patient is unconscious, and first assess the patient's pulse, followed by other aspects of circulation",
         type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
         feedbackAbsent: ["Since this patient is unconscious, be sure to check the carotid pulse first, or simultaneously with the radial pulse, to determine if CPR is needed.  Also assess the skin to check for shock and be sure to perform a gross blood sweep.", "You would have noticed that your patient had weak slow pulses and dry cyanotic skin, indicating impending respiratory failure."],
-        feedbackOutOfOrder: ["All unconscious patients should have a pulse check before starting the ABCs. However, paramedics often check breathing while doing a pulse check.  If the patient is pulseless, you will start high-quality CPR immediately.", "An acronym used by some providers for unconscious patients is CABC, which refers to a pulse check (while simultaneously feeling for breathing) before the assessment of the rest of the ABCs.)"],
+        feedbackOutOfOrder: [""],
         feedbackErrors: [""],
         examineIfAbsent: false,
         examineIfErrors: false,
@@ -13538,7 +13665,7 @@ const SC8CP_PhaseIE = {
             label: "check the appropriate pulse(s)",
             type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
             feedbackAbsent: ["First check for a radial pulse. However, if you don't feel one, you want to check a carotid pulse.", "This patient's radial pulses were absent, but he did have a weak carotid pulse, which would prompt you to worry about shock."],
-            feedbackOutOfOrder: [""],
+            feedbackOutOfOrder: ["All unconscious patients should have a pulse check before starting the ABCs. However, paramedics often check breathing while doing a pulse check.  If the patient is pulseless, you will start high-quality CPR immediately.", "An acronym used by some providers for unconscious patients is CABC, which refers to a pulse check (while simultaneously feeling for breathing) before the assessment of the rest of the ABCs.)"],
             feedbackErrors: ["First check for a radial pulse. However, if you don't feel one, you want to check a carotid pulse.", "This patient's radial pulses were absent, but he did have a weak carotid pulse, which would prompt you to worry about shock."],
             examineIfAbsent: false,
             examineIfErrors: false,
@@ -13551,7 +13678,7 @@ const SC8CP_PhaseIE = {
             label: "check pulse rate, rhythm, and quality",
             type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
             feedbackAbsent: ["Checking this patient's pulse rate would have revealed that he was tachycardic. A significantly elevated or depressed pulse rate can suggest shock or respiratory failure.", "While this patient's heart had a regular rhythm, remember that an irregular rhythm can suggest impending cardiac arrest or arrhythmia.", "A patient in shock may have weak or absent pulses distally, such as this patient, suggestive of shock."],
-            feedbackOutOfOrder: [""],
+            feedbackOutOfOrder: ["All unconscious patients should have a pulse check before starting the ABCs. However, paramedics often check breathing while doing a pulse check.  If the patient is pulseless, you will start high-quality CPR immediately.", "An acronym used by some providers for unconscious patients is CABC, which refers to a pulse check (while simultaneously feeling for breathing) before the assessment of the rest of the ABCs.)"],
             feedbackErrors: [""],
             examineIfAbsent: false,
             examineIfErrors: false,
@@ -13563,7 +13690,7 @@ const SC8CP_PhaseIE = {
               label: "rate",
               type: _constants__WEBPACK_IMPORTED_MODULE_0__.ACTION_TYPES.REQ,
               feedbackAbsent: ["Checking this patient's pulse rate would have revealed that he was tachycardic. A significantly elevated or depressed pulse rate can suggest shock or respiratory failure."],
-              feedbackOutOfOrder: [""],
+              feedbackOutOfOrder: ["All unconscious patients should have a pulse check before starting the ABCs. However, paramedics often check breathing while doing a pulse check.  If the patient is pulseless, you will start high-quality CPR immediately.", "An acronym used by some providers for unconscious patients is CABC, which refers to a pulse check (while simultaneously feeling for breathing) before the assessment of the rest of the ABCs.)"],
               feedbackErrors: [""],
               examineIfAbsent: false,
               examineIfErrors: false,
@@ -16170,9 +16297,9 @@ const globalReassessmentKn = {
   }
 };
 const globalReassessmentFeedback = {
-  good: "This patient had several abnormal baseline vitals—most notably @requiredVitals +bos The patient needed @criticalInterventions +bos You correctly checked for improvement in these vitals to ensure that the patient's @systems was adequately managed +eos",
-  errors: "This patient had several abnormal baseline vitals—most notably @requiredVitals +bos The patient needed @criticalInterventions +bos You should have checked for improvement in all of these vitals to ensure that the patient's @systems was adequately managed +bos You missed checking @notDone +eos",
-  absent: "This patient had several abnormal baseline vitals—most notably @requiredVitals +bos The patient needed @criticalInterventions +bos You should have checked for improvement in these vitals to ensure that the patient's @systems was adequately managed +eos"
+  good: "This patient had several abnormal baseline vitals-most notably @requiredVitals +bos The patient needed @criticalInterventions +bos You correctly checked for improvement in these vitals to ensure that the patient's @systems was adequately managed +eos",
+  errors: "This patient had several abnormal baseline vitals-most notably @requiredVitals +bos The patient needed @criticalInterventions +bos You should have checked for improvement in all of these vitals to ensure that the patients @systems was adequately managed +bos You missed checking @notDone +eos",
+  absent: "This patient had several abnormal baseline vitals-most notably @requiredVitals +bos The patient needed @criticalInterventions +bos You should have checked for improvement in these vitals to ensure that the patients @systems was adequately managed +eos"
 }; //vitals that can be inferred to have been taken due to an
 //assessment step.  However, for assessment steps the findings
 //are not actual taking of vitals but a quick subjective impression
@@ -17531,13 +17658,15 @@ const colorTypes = {
   "Good": "text-success",
   "Caution": "text-warning",
   "Problem": "text-danger",
-  "Not implemented": "text-muted"
+  "Not implemented": "text-muted",
+  "Temporal": "text-danger"
 };
 const iconTypes = {
   "Good": "sentiment_satisfied",
   "Caution": "report_problem",
   "Problem": "highlight_off",
-  "Not implemented": "sentiment_neutral"
+  "Not implemented": "sentiment_neutral",
+  "Temporal": "alarm"
 }; //Feedback substitute commands for feedback template
 //@ means substitute this entry field into the feedback template and if no value in field say this in feedback, 
 //? means substitute this entry field into the feedback template if the value exists,
@@ -17568,25 +17697,25 @@ const fbTemplatesDef = {
   "goodIntv": ["Good", "?intvStatusFB +eos"],
   "inferred-done": ["Good", ""],
   //only for assessments
-  "misOrdered-assessment": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB +eos"],
-  "misOrdered-assessment-option": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB +eos"],
-  "misOrdered-decision-option": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB"],
-  "misOrdered-required-action": ["Problem", "+bec Mistimed assessment step +eec +bos @orderingFB"],
-  "misOrdered-optional": ["Problem", "+bec Mistimed intervention +eec +bos @orderingFB"],
-  "misOrdered-redundant": ["Problem", "+bec Redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
+  "misOrdered-assessment": ["Temporal", "+bec Mistimed assessment step +eec +bos @orderingFB +eos"],
+  "misOrdered-assessment-option": ["Temporal", "+bec Mistimed assessment step +eec +bos @orderingFB +eos"],
+  "misOrdered-decision-option": ["Temporal", "+bec Mistimed assessment step +eec +bos @orderingFB"],
+  "misOrdered-required-action": ["Temporal", "+bec Mistimed assessment step +eec +bos @orderingFB"],
+  "misOrdered-optional": ["Temporal", "+bec Mistimed intervention +eec +bos @orderingFB"],
+  "misOrdered-redundant": ["Temporal", "+bec Redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
   //don't give additional feedback on redudant intervention
-  "misOrdered-goodIntv": ["Problem", "+bec Mistimed intervention +eec +bos @orderingFB"],
+  "misOrdered-goodIntv": ["Temporal", "+bec Mistimed intervention +eec +bos @orderingFB"],
   "not-graded": ["Caution", "+bec Not reported to you +eec +bos You would have been told that the finding for @label was @finding +eos"],
   //once software re-written to optimaize all design changes, this section should be condensed to just
   //"misOrdered-phase": ["Problem", "Section not completed before starting another +bos @orderingFB +eos"]
   //since we are no longer placing the phase feedback in the first item of a phase
-  "misOrdered-phase-assessment": ["Problem", "+bec Section not completed before starting another +eec +bos @orderingFB +eos"],
-  "misOrdered-phase-assessment-option": ["Problem", "+bec Section not completed before starting another +eec +bos @orderingFB +eos"],
-  "misOrdered-phase-decision-option": ["Problem", "+bec Section not completed before starting another +eec +bos @orderingFB"],
-  "misOrdered-phase-required-action": ["Problem", "+bec Section not completed before starting another +eec +bos @orderingFB"],
-  "misOrdered-phase-redundant": ["Problem", "+bec Section not completed before starting another +eec +bos @orderingFB"],
-  "misOrdered-phase-goodIntv": ["Problem", "+bec Section not completed before starting another +eec +bos @orderingFB"],
-  "misOrdered-phase-optional": ["Problem", "+bec Section not completed before starting another +eec +bos @orderingFB"],
+  "misOrdered-phase-assessment": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB +eos"],
+  "misOrdered-phase-assessment-option": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB +eos"],
+  "misOrdered-phase-decision-option": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB"],
+  "misOrdered-phase-required-action": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB"],
+  "misOrdered-phase-redundant": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB"],
+  "misOrdered-phase-goodIntv": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB"],
+  "misOrdered-phase-optional": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB"],
   //assuming status checks can't be misordered
   //design of intervention & vitals status checks still in flux but current design still uses this
   "intvCheckWNoIntvFound": ["Caution", "You didn't do this intervention so it doesn't make sense to check the status of it at this point."],
@@ -17611,7 +17740,7 @@ const fbTemplatesDef = {
   "misOrdered-redundant-incorrect-answers": ["Problem", "+bec Incorrectly administered, redundant intervention +eec +bos You already did an alternative to this: @redundantToFB +eos"],
   //minimal is no longer guaranteed to work so could remove these once verified during optimization of all design changes
   "misOrdered-minimal-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @orderingFB +bos @minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
-  "misOrdered-minimal": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @orderingFB +bos @minimalWhy +bos ?intvStatusFB +eos"],
+  "misOrdered-minimal": ["Temporal", "+bec Mistimed intervention +eec +bos @orderingFB +bos @minimalWhy +bos ?intvStatusFB +eos"],
   //once analysis software re-written to optimaize all design changes, this section can be eliminated
   //since we are no longer placing the phase feedback in the first item of a phase
   "misOrdered-phase-assessment-option-incorrect": ["Problem", "+bec Incorrect, mistimed assessment step +eec +bos @incorrectAnswersFB +bos @orderingFB +eos "],
@@ -17620,11 +17749,12 @@ const fbTemplatesDef = {
   "misOrdered-phase-optional-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos ?why +bos @incorrectAnswersFB +bos @orderingFB +bos ?intvStatusFB +eos"],
   "misOrdered-phase-redundant-incorrect-answers": ["Problem", "+bec Redundant, mistimed intervention +eec +bos You already did an alternative to this: @redundantToFB +bos @orderingFB +eos"],
   "misOrdered-phase-minimal-incorrect-answers": ["Problem", "+bec Incorrectly administered, mistimed intervention +eec +bos @orderingFB +bos ?minimalWhy +bos @incorrectAnswersFB +bos ?intvStatusFB +eos"],
-  "misOrdered-phase-minimal": ["Problem", "+bec Misordered +eec +bos @orderingFB +bos ?minimalWhy +bos ?intvStatusFB +eos"],
+  "misOrdered-phase-minimal": ["Temporal", "+bec Mistimed section +eec +bos @orderingFB +bos ?minimalWhy +bos ?intvStatusFB +eos"],
   "green": ["Good", ""],
   //just for headers
   "red": ["Problem", ""],
   //just for headers
+  "red": ["Temporal", ""],
   "yellow": ["Caution", ""],
   //just for headers
   "notFound": ["Not implemented", "This item has no definition or is no longer defined", ""],
