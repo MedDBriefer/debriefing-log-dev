@@ -100,7 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 // When building for production, this file is replaced with `environment.prod.ts`.
 const environment = {
   production: false,
-  firebaseProject: "MedDebrieferDev" || 0
+  firebaseProject: "MedDBrieferDev" || 0
 };
 
 /***/ }),
