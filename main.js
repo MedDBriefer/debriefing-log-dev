@@ -100,8 +100,7 @@ __webpack_require__.r(__webpack_exports__);
 // When building for production, this file is replaced with `environment.prod.ts`.
 const environment = {
   production: false,
-  //firebaseProject: process.env.NX_FIREBASE_PROJECT || "MedDBrieferDev"
-  firebaseProject: "MedDBrieferDev"
+  firebaseProject: "MedDebrieferDev" || 0
 };
 
 /***/ }),
@@ -2356,7 +2355,9 @@ const generateIntvStatusFB = currentEntry => {
 let fbSource = "json"; //values are "db" or "json"
 
 function getFBField(currentEntry, field, c2FB) {
-  let result;
+  let tailoredFB = "";
+  let genFB = "";
+  let combinedResult = "";
   let indexLabel;
 
   if (currentEntry.variantID) {
@@ -2375,18 +2376,18 @@ function getFBField(currentEntry, field, c2FB) {
         case "assessmentFB":
           //get from c2 ds field feedbackAbsent
           if (fb && fb.feedbackAbsent && fb.feedbackAbsent[0] !== "") {
-            result = fb.feedbackAbsent;
+            tailoredFB = fb.feedbackAbsent;
           }
 
           break;
 
         case "why":
           if (fb && ["contraindicated", "unnecessary", "irrelevant"].includes(status) && fb.feedbackErrors && fb.feedbackErrors[0] !== "") {
-            result = fb.feedbackErrors;
+            tailoredFB = fb.feedbackErrors;
           }
 
           if (fb && !["contraindicated", "unnecessary", "irrelevant"].includes(status) && fb.feedbackAbsent && fb.feedbackAbsent[0] !== "") {
-            result = fb.feedbackAbsent;
+            tailoredFB = fb.feedbackAbsent;
           }
 
           break;
@@ -2394,14 +2395,15 @@ function getFBField(currentEntry, field, c2FB) {
         case "incorrectAnswersFB":
           //get from c2 ds field feedbackErrors
           if (fb && fb.feedbackErrors && fb.feedbackErrors[0] !== "") {
-            result = fixStrSp(currentEntry[field]) + ".\xa0\xa0" + fb.feedbackErrors;
+            genFB = fixStrSp(currentEntry[field]) + ".\xa0\xa0";
+            tailoredFB = fb.feedbackErrors;
           }
 
           break;
 
         case "orderingFB":
           if (fb && fb.feedbackOutOfOrder && fb.feedbackOutOfOrder[0] !== "") {
-            result = fb.feedbackOutOfOrder;
+            tailoredFB = fb.feedbackOutOfOrder;
           }
 
           break;
@@ -2414,21 +2416,24 @@ function getFBField(currentEntry, field, c2FB) {
     default:
   }
 
-  let combinedResult = "";
-
-  if (!!result && Array.isArray(result)) {
-    result.forEach((para, i) => {
+  if (!!tailoredFB && Array.isArray(tailoredFB)) {
+    tailoredFB.forEach((para, i) => {
       //use below commented out block instead if want to preserve breaks put in condition 2 feedback
 
-      /* if (i < result.length-1){
+      /* if (i < tailoredFB.length-1){
         combinedResult = combinedResult + para + "</p>"}
       else {combinedResult = combinedResult + para} */
-      combinedResult = combinedResult + para;
+      if (combinedResult !== "") {
+        combinedResult = combinedResult + "\xa0\xa0" + para;
+      } else {
+        combinedResult = para;
+      }
     });
+    combinedResult = genFB + combinedResult;
   } //to deal with old analysis/feedback file from before c2FB feedback fields became an array of strings instead of a string
   else {
-    if (!!result) {
-      combinedResult = result;
+    if (!!tailoredFB) {
+      combinedResult = genFB + tailoredFB;
     }
   }
 
@@ -16293,7 +16298,7 @@ const globalReassessmentKn = {
   "B7CA": {
     vitalLabels: ["BP", "P", "R", "SpO2"],
     requiredVitals: "BP, P, R, and SpO2",
-    systems: "breathingd",
+    systems: "breathing",
     criticalInterventions: "supplemental O2 via NRM, pleural decompression and an occlusive dressing to the entrance wound "
   }
 };
